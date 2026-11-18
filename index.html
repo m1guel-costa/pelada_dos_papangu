@@ -82,6 +82,18 @@ h1{text-align:center;margin:14px 0 20px;letter-spacing:-.03em}
 #draw-summary{font-weight:600}
 #draw-result .panel{background:#152a37;border-color:#326b52}
 @media(max-width:480px){.wrap{padding:10px 12px 40px}#app-nav{gap:4px}#app-nav .tab{min-height:54px;padding:6px 2px;font-size:.69rem}#ranking .item .stars{width:auto;padding-left:0}#app-actions{gap:6px}#app-actions button{flex:1 1 0}.guest-box{padding:12px}}
+
+/* Avaliações visíveis na seleção de jogadores */
+#participants .item{flex-wrap:nowrap;gap:10px}
+#participants .participant-name{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;font-weight:600}
+#participants .participant-name small{display:block;font-weight:400}
+#participants .participant-stars{flex:0 0 auto;white-space:nowrap;color:#facc15;font-size:clamp(.8rem,2.8vw,1rem);letter-spacing:-1px}
+#participants .item input[type=checkbox]{flex:0 0 22px}
+.guest-stars-label{flex:0 0 190px}
+.guest-stars-label select{margin-bottom:16px}
+.guest-item .stars{font-size:.9rem}
+.guest-item .guest-details{flex:1;min-width:0;overflow-wrap:anywhere}
+@media(max-width:480px){.guest-stars-label{flex:1 1 140px}.guest-box form button{width:100%;margin:0 0 10px}#participants .item{padding:10px 8px}}
 </style></head><body><div class="wrap">
 <h1>⚽ Pelada dos Papangu</h1><p id="message" aria-live="polite"></p>
 <section id="setup" class="panel hide"><h2>Configuração pendente</h2><p>O administrador precisa configurar o Supabase em <code>supabase-config.js</code>.</p></section>
@@ -107,7 +119,7 @@ h1{text-align:center;margin:14px 0 20px;letter-spacing:-.03em}
 <p id="profile-stars"></p><button>Salvar meu perfil</button></form></section>
 <section id="ranking-section" class="panel tab-panel"><h2>🏆 Ranking</h2><div id="ranking"></div></section>
 <section id="sorteio-section" class="panel tab-panel hide"><h2>🎲 Sorteio de times</h2><p class="muted">Marque os mensalistas presentes e adicione diaristas pelo nome. Diaristas participam apenas deste sorteio, sem criar conta.</p><label>Times<input id="team-count" type="number" min="2" max="6" value="2"></label>
-<label>Jogadores por time<input id="team-size" type="number" min="2" max="15" value="5"></label><h3>Mensalistas presentes <span id="selected-count" class="count">0 selecionados</span></h3><div id="participants"></div><div class="guest-box"><h3>+ Adicionar diarista</h3><form id="guest-form"><label>Nome do diarista<input id="guest-name" maxlength="80" placeholder="Ex.: Lucas" required></label><button type="submit">Adicionar diarista</button></form><div id="guest-list"></div></div><p id="draw-summary" class="muted"></p>
+<label>Jogadores por time<input id="team-size" type="number" min="2" max="15" value="5"></label><h3>Mensalistas presentes <span id="selected-count" class="count">0 selecionados</span></h3><div id="participants"></div><div class="guest-box"><h3>+ Adicionar diarista</h3><form id="guest-form"><label>Nome do diarista<input id="guest-name" maxlength="80" placeholder="Ex.: Lucas" required></label><label class="guest-stars-label">Avaliação<select id="guest-stars" aria-label="Estrelas do diarista"><option value="1">★☆☆☆☆ · 1 estrela</option><option value="2">★★☆☆☆ · 2 estrelas</option><option value="3" selected>★★★☆☆ · 3 estrelas</option><option value="4">★★★★☆ · 4 estrelas</option><option value="5">★★★★★ · 5 estrelas</option></select></label><button type="submit">Adicionar diarista</button></form><div id="guest-list"></div></div><p id="draw-summary" class="muted"></p>
 <button id="draw">Sortear times equilibrados</button><div id="draw-result"></div></section>
 <section id="admin" class="panel tab-panel hide"><h2>⭐ Avaliação dos mensalistas</h2><p class="muted">Somente o administrador pode atribuir estrelas. O ranking é atualizado automaticamente.</p><div id="admin-list"></div></section></section>
 </div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="supabase-config.js"></script><script src="app.js"></script></body></html>
