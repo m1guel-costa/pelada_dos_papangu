@@ -34,18 +34,44 @@ function initDefaults() {
     saveData(KEY_USERS, users);
   }
 
-  let players = loadData(KEY_PLAYERS);
-  if (!players.length) {
-    players = [
-      { id: uid(), nome: 'Ronaldo',    apelido: 'Fenômeno', posicao: 'Atacante',   estrelas: 5, foto: '' },
-      { id: uid(), nome: 'Zico',       apelido: 'Galinho',  posicao: 'Meio-campo', estrelas: 5, foto: '' },
-      { id: uid(), nome: 'Cafu',       apelido: 'Cafu',     posicao: 'Defensor',   estrelas: 4, foto: '' },
-      { id: uid(), nome: 'Taffarel',   apelido: 'Taffarel', posicao: 'Goleiro',    estrelas: 4, foto: '' },
-      { id: uid(), nome: 'Rivaldo',    apelido: 'Rivaldinho',posicao: 'Atacante',  estrelas: 4, foto: '' },
-      { id: uid(), nome: 'Roberto Carlos', apelido: 'RC',  posicao: 'Defensor',   estrelas: 4, foto: '' },
+  // Migração única: substitui os jogadores fictícios pelos mensalistas de novembro/2026.
+  // Não sobrescreve alterações feitas pelos administradores após a migração.
+  const playersVersion = 'papangu_players_nov2026_v1';
+  if (localStorage.getItem(playersVersion) !== 'ok') {
+    const nomesMensalistas = [
+      'Miguel',
+      'Moa',
+      'Eva',
+      'Viana',
+      'Igor',
+      'Cauã',
+      'Leo22',
+      'Lucas',
+      'Math',
+      'Guete',
+      'Bruno',
+      'Lucas G',
+      'Luna',
+      'Rapha',
+      'João Henrique',
+      'Meiota',
+      'Bebeto',
+      'Bosco',
+      'Filipe',
+      'Cadoca'
     ];
-    saveData(KEY_PLAYERS, players);
+    const jogadoresReais = nomesMensalistas.map((nome, i) => ({
+      id: 'mensalista-nov26-' + (i + 1),
+      nome,
+      apelido: '',
+      posicao: 'Não definida',
+      estrelas: 3, // avaliação provisória até o administrador definir
+      foto: ''
+    }));
+    saveData(KEY_PLAYERS, jogadoresReais);
+    localStorage.setItem(playersVersion, 'ok');
   }
+
 }
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }

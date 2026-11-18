@@ -102,13 +102,14 @@
     <div id="page-ranking" class="page active">
       <div class="page-header">
         <h2>🏆 Ranking de Jogadores</h2>
-        <p>Classificação por estrelas</p>
+        <p>Classificação por estrelas · Avaliações iniciais provisórias (3 estrelas) até atualização pelo administrador</p>
       </div>
 
       <div class="filter-bar">
         <input type="text" id="search-player" placeholder="🔍 Buscar jogador..." oninput="renderRanking()" />
         <select id="filter-pos" onchange="renderRanking()">
           <option value="">Todas as posições</option>
+          <option value="Não definida">Não definida</option>
           <option value="Goleiro">Goleiro</option>
           <option value="Defensor">Defensor</option>
           <option value="Meio-campo">Meio-campo</option>
@@ -201,6 +202,7 @@
             <div class="form-group">
               <label>Posição</label>
               <select id="p-posicao">
+                <option value="Não definida">Não definida</option>
                 <option value="Atacante">Atacante</option>
                 <option value="Meio-campo">Meio-campo</option>
                 <option value="Defensor">Defensor</option>
