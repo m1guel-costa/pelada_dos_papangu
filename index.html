@@ -7,7 +7,7 @@ body{background:#0f172a;color:#f1f5f9;font-family:system-ui,sans-serif;margin:0}
 input,select{width:100%;padding:12px;margin:7px 0 16px;border:1px solid #475569;border-radius:8px;background:#0f172a;color:white;box-sizing:border-box}
 button{padding:11px 16px;border:0;border-radius:8px;background:#16a34a;color:white;cursor:pointer;margin:4px}
 button.secondary{background:#334155}.hide{display:none!important}.item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border-bottom:1px solid #334155;flex-wrap:wrap}
-small,.muted{color:#94a3b8}.error{color:#fca5a5}.stars{color:#facc15}nav{display:flex;gap:6px;flex-wrap:wrap}h1{color:#facc15}
+small,.muted{color:#94a3b8}.error{color:#fca5a5}.stars{color:#facc15}nav{display:flex;gap:6px;flex-wrap:wrap}h1{color:#facc15}.avatar{width:46px;height:46px;object-fit:cover;border-radius:50%;background:#334155;flex-shrink:0}.player-info{display:flex;align-items:center;gap:10px}.photo-note{font-size:.85rem;color:#94a3b8}.preview-avatar{width:80px;height:80px;object-fit:cover;border-radius:50%;display:block;margin:8px 0}
 </style></head><body><div class="wrap">
 <h1>⚽ Pelada dos Papangu</h1><p id="message" aria-live="polite"></p>
 <section id="setup" class="panel hide"><h2>Configuração pendente</h2><p>O administrador precisa configurar o Supabase em <code>supabase-config.js</code>.</p></section>
@@ -16,10 +16,10 @@ small,.muted{color:#94a3b8}.error{color:#fca5a5}.stars{color:#facc15}nav{display
 <form id="login-form"><label>E-mail<input id="login-email" type="email" required autocomplete="email"></label><label>Senha<input id="login-password" type="password" required autocomplete="current-password"></label><button>Entrar</button></form>
 <form id="register-form" class="hide"><label>Nome<input id="reg-name" required minlength="2" maxlength="100"></label><label>Apelido (opcional)<input id="reg-nick" maxlength="100"></label>
 <label>Posição<select id="reg-position"><option>Goleiro</option><option>Defensor</option><option>Meio-campo</option><option>Atacante</option></select></label>
-<label>E-mail<input id="reg-email" type="email" required autocomplete="email"></label><label>Senha (mínimo 8 caracteres)<input id="reg-password" type="password" minlength="8" required autocomplete="new-password"></label>
+<label>Foto de perfil (opcional)<input id="reg-photo" type="file" accept="image/jpeg,image/png,image/webp"></label><img id="reg-photo-preview" class="preview-avatar hide" alt="Prévia da foto"><p class="photo-note">JPG, PNG ou WebP, até 2 MB. Se confirmar o e-mail em outro dispositivo, adicione a foto em Meu perfil depois.</p><label>E-mail<input id="reg-email" type="email" required autocomplete="email"></label><label>Senha (mínimo 8 caracteres)<input id="reg-password" type="password" minlength="8" required autocomplete="new-password"></label>
 <p class="muted">A avaliação começa com 3 estrelas e só o administrador pode alterá-la.</p><button>Criar conta</button></form></section>
 <section id="app" class="hide"><nav><button id="logout" class="secondary">Sair</button><button id="refresh" class="secondary">Atualizar ranking</button></nav>
-<section class="panel"><h2>Meu perfil</h2><form id="profile-form"><label>Nome<input id="profile-name" required maxlength="100"></label><label>Apelido<input id="profile-nick" maxlength="100"></label>
+<section class="panel"><h2>Meu perfil</h2><form id="profile-form"><img id="profile-photo-preview" class="preview-avatar hide" alt="Minha foto de perfil"><label>Minha foto<input id="profile-photo" type="file" accept="image/jpeg,image/png,image/webp"></label><p class="photo-note">Foto opcional, até 2 MB. Os outros jogadores poderão vê-la.</p><label>Nome<input id="profile-name" required maxlength="100"></label><label>Apelido<input id="profile-nick" maxlength="100"></label>
 <label>Posição<select id="profile-position"><option>Goleiro</option><option>Defensor</option><option>Meio-campo</option><option>Atacante</option><option>Não definida</option></select></label>
 <p id="profile-stars"></p><button>Salvar meu perfil</button></form></section>
 <section class="panel"><h2>🏆 Ranking</h2><div id="ranking"></div></section>
