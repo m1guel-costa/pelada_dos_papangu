@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pelada dos Papangu ⚽</title><link rel="stylesheet" href="style.css">
+<title>Pelada dos Papangu ⚽</title>
 <style>
 body{background:#0f172a;color:#f1f5f9;font-family:system-ui,sans-serif;margin:0}
 .wrap{max-width:900px;margin:35px auto;padding:16px}.panel{background:#1e293b;padding:24px;border-radius:16px;margin:16px 0}
@@ -8,6 +8,53 @@ input,select{width:100%;padding:12px;margin:7px 0 16px;border:1px solid #475569;
 button{padding:11px 16px;border:0;border-radius:8px;background:#16a34a;color:white;cursor:pointer;margin:4px}
 button.secondary{background:#334155}.hide{display:none!important}.item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border-bottom:1px solid #334155;flex-wrap:wrap}
 small,.muted{color:#94a3b8}.error{color:#fca5a5}.stars{color:#facc15}nav{display:flex;gap:6px;flex-wrap:wrap}h1{color:#facc15}.avatar{width:46px;height:46px;object-fit:cover;border-radius:50%;background:#334155;flex-shrink:0}.player-info{display:flex;align-items:center;gap:10px}.photo-note{font-size:.85rem;color:#94a3b8}.preview-avatar{width:80px;height:80px;object-fit:cover;border-radius:50%;display:block;margin:8px 0}
+
+/* Interface responsiva: celular primeiro */
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+*,*::before,*::after{box-sizing:border-box}
+body{min-width:0;overflow-x:hidden;line-height:1.5}
+.wrap{width:100%;max-width:900px;margin:0 auto;padding:clamp(12px,3vw,24px)}
+h1{font-size:clamp(1.45rem,5vw,2rem);line-height:1.2;margin:12px 0 20px;overflow-wrap:anywhere}
+h2{font-size:clamp(1.2rem,4vw,1.55rem);margin:0 0 16px}
+h3{margin:0 0 12px}
+.panel{min-width:0;padding:clamp(16px,4vw,24px);margin:14px 0;border:1px solid #334155;overflow-wrap:anywhere}
+input,select,button{font:inherit}
+input,select{font-size:16px;min-width:0;max-width:100%}
+input[type=file]{padding:10px 6px;white-space:normal}
+button{min-height:44px;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #facc15;outline-offset:2px}
+nav{align-items:stretch}
+nav button{flex:1 1 auto;margin:0}
+#auth nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:18px}
+#show-forgot{grid-column:1/-1}
+#app-nav{position:sticky;top:0;z-index:10;background:#0f172aee;backdrop-filter:blur(12px);padding:10px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+#app-nav a{display:flex;justify-content:center;align-items:center;text-align:center;min-height:46px;padding:8px 5px;border-radius:9px;background:#334155;color:#f1f5f9;text-decoration:none;font-size:.9rem;font-weight:600}
+#app-nav a:focus-visible,#app-nav a:hover{background:#166534}
+#app-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+#app-actions button{margin:0;flex:1 1 145px}
+.item{min-width:0;align-items:center}
+.player-info{min-width:0;flex:1 1 160px}
+.player-info>span:last-child{min-width:0;overflow-wrap:anywhere}
+.stars{flex-shrink:0;white-space:nowrap}
+#ranking .item{gap:12px}
+#participants .item{cursor:pointer;align-items:center}
+#participants .item span{min-width:0;flex:1;overflow-wrap:anywhere}
+#participants input[type=checkbox]{flex:0 0 22px;height:22px;margin:0}
+#admin-list .item label{max-width:100%;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#admin-list select{width:auto;min-width:95px;margin:0}
+#draw-result .panel{margin:10px 0}
+#message:not(:empty){padding:12px 14px;background:#334155;border-radius:10px;margin:12px 0;overflow-wrap:anywhere}
+#message.error{background:#451a1a}
+@media(max-width:480px){
+ .wrap{padding:12px}
+ .panel{padding:16px;border-radius:12px}
+ #app-nav a{font-size:.82rem}
+ #ranking .item{align-items:flex-start}
+ #ranking .stars{width:100%;padding-left:56px}
+ #auth button[type=submit],#login-form>button,#register-form>button,#forgot-form>button,#reset-form>button,#profile-form>button,#draw{width:100%;margin:4px 0}
+ .avatar{width:44px;height:44px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style></head><body><div class="wrap">
 <h1>⚽ Pelada dos Papangu</h1><p id="message" aria-live="polite"></p>
 <section id="setup" class="panel hide"><h2>Configuração pendente</h2><p>O administrador precisa configurar o Supabase em <code>supabase-config.js</code>.</p></section>
@@ -20,12 +67,14 @@ small,.muted{color:#94a3b8}.error{color:#fca5a5}.stars{color:#facc15}nav{display
 <label>Posição<select id="reg-position"><option>Goleiro</option><option>Defensor</option><option>Meio-campo</option><option>Atacante</option></select></label>
 <label>Foto de perfil (opcional)<input id="reg-photo" type="file" accept="image/*"></label><img id="reg-photo-preview" class="preview-avatar hide" alt="Prévia da foto"><p class="photo-note">Escolha uma foto da galeria; o site ajusta automaticamente o tamanho. Se confirmar o e-mail em outro dispositivo, adicione a foto em Meu perfil depois.</p><label>E-mail<input id="reg-email" type="email" required autocomplete="email"></label><label>Senha (mínimo 8 caracteres)<input id="reg-password" type="password" minlength="8" required autocomplete="new-password"></label>
 <p class="muted">A avaliação começa com 3 estrelas e só o administrador pode alterá-la.</p><button>Criar conta</button></form></section>
-<section id="app" class="hide"><nav><button id="logout" class="secondary">Sair</button><button id="refresh" class="secondary">Atualizar ranking</button></nav>
-<section class="panel"><h2>Meu perfil</h2><form id="profile-form"><img id="profile-photo-preview" class="preview-avatar hide" alt="Minha foto de perfil"><label>Minha foto<input id="profile-photo" type="file" accept="image/jpeg,image/png,image/webp"></label><p class="photo-note">Foto opcional; o site ajusta automaticamente o tamanho. Os outros jogadores poderão vê-la.</p><label>Nome<input id="profile-name" required maxlength="100"></label><label>Apelido<input id="profile-nick" maxlength="100"></label>
+<section id="app" class="hide">
+<nav id="app-nav" aria-label="Navegação do site"><a href="#meu-perfil">👤 Perfil</a><a href="#ranking-section">🏆 Ranking</a><a href="#sorteio-section">🎲 Sorteio</a></nav>
+<div id="app-actions"><button id="refresh" class="secondary">↻ Atualizar ranking</button><button id="logout" class="secondary">Sair da conta</button></div>
+<section id="meu-perfil" class="panel"><h2>Meu perfil</h2><form id="profile-form"><img id="profile-photo-preview" class="preview-avatar hide" alt="Minha foto de perfil"><label>Minha foto<input id="profile-photo" type="file" accept="image/*"></label><p class="photo-note">Foto opcional; o site ajusta automaticamente o tamanho. Os outros jogadores poderão vê-la.</p><label>Nome<input id="profile-name" required maxlength="100"></label><label>Apelido<input id="profile-nick" maxlength="100"></label>
 <label>Posição<select id="profile-position"><option>Goleiro</option><option>Defensor</option><option>Meio-campo</option><option>Atacante</option><option>Não definida</option></select></label>
 <p id="profile-stars"></p><button>Salvar meu perfil</button></form></section>
-<section class="panel"><h2>🏆 Ranking</h2><div id="ranking"></div></section>
-<section class="panel"><h2>🎲 Sorteio de times</h2><label>Times<input id="team-count" type="number" min="2" max="6" value="2"></label>
+<section id="ranking-section" class="panel"><h2>🏆 Ranking</h2><div id="ranking"></div></section>
+<section id="sorteio-section" class="panel"><h2>🎲 Sorteio de times</h2><label>Times<input id="team-count" type="number" min="2" max="6" value="2"></label>
 <label>Jogadores por time<input id="team-size" type="number" min="2" max="15" value="5"></label><p>Marque os presentes:</p><div id="participants"></div>
 <button id="draw">Sortear times equilibrados</button><div id="draw-result"></div></section>
 <section id="admin" class="panel hide"><h2>🛡️ Administração</h2><p>Somente administradores podem alterar estrelas.</p><div id="admin-list"></div></section></section>
