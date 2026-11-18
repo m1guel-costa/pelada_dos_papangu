@@ -141,12 +141,23 @@ label{font-weight:550}
 #profile-form>button,#register-form>button,#login-form>button,#forgot-form>button,#reset-form>button{min-height:50px}
 @media(max-width:480px){.wrap{padding:12px 12px 44px}.panel{padding:17px;border-radius:16px}#app-nav{gap:3px;padding:5px}#app-nav .tab{font-size:.69rem;min-height:52px;padding:6px 2px}#ranking .item{padding:12px}#draw{font-size:1rem}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Marca d'agua decorativa: imagem adicionada em assets/papangu-marca.jpg */
+body::before{content:"";position:fixed;right:-25px;bottom:12px;width:clamp(170px,38vw,320px);height:clamp(220px,52vw,430px);background-image:url("assets/papangu-marca.jpg");background-size:cover;background-position:50% 30%;opacity:.075;filter:grayscale(1);-webkit-mask-image:linear-gradient(to top,#000 38%,transparent 100%);mask-image:linear-gradient(to top,#000 38%,transparent 100%);pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1}
+#auth{position:relative}
+#auth::after{content:"";position:absolute;right:8px;bottom:8px;width:95px;height:125px;background:url("assets/papangu-marca.jpg") center 25%/cover no-repeat;opacity:.085;filter:grayscale(1);border-radius:12px;pointer-events:none;-webkit-mask-image:linear-gradient(to top,#000 35%,transparent);mask-image:linear-gradient(to top,#000 35%,transparent)}
+#login-form{position:relative;z-index:1}
+#login-form .forgot-link{display:block;margin:-7px 0 18px auto;padding:4px 0;min-height:30px;width:fit-content;max-width:100%;border:0;border-radius:0;background:none;box-shadow:none;color:#86efac;text-decoration:underline;text-decoration-color:#86efac88;text-underline-offset:4px;font-size:.9rem;font-weight:600;text-align:right}
+#login-form .forgot-link:hover{background:none;box-shadow:none;transform:none;color:#bbf7d0;text-decoration-color:currentColor}
+#login-form .forgot-link:active{transform:scale(.97)}
+@media(max-width:480px){body::before{right:-55px;bottom:20px;width:230px;height:310px;opacity:.065}#auth::after{width:72px;height:100px;opacity:.06}}
 </style></head><body><div class="wrap">
 <h1>⚽ Pelada dos Papangu</h1><p id="message" aria-live="polite"></p>
 <section id="setup" class="panel hide"><h2>Configuração pendente</h2><p>O administrador precisa configurar o Supabase em <code>supabase-config.js</code>.</p></section>
 <section id="auth" class="panel hide"><h2>Entrar ou cadastrar</h2>
-<nav><button id="show-login">Entrar</button><button id="show-register" class="secondary">Criar conta</button><button id="show-forgot" class="secondary">Esqueci minha senha</button></nav>
-<form id="login-form"><label>E-mail<input id="login-email" type="email" required autocomplete="email"></label><label>Senha<input id="login-password" type="password" required autocomplete="current-password"></label><button>Entrar</button></form>
+<nav><button id="show-login">Entrar</button><button id="show-register" class="secondary">Criar conta</button></nav>
+<form id="login-form"><label>E-mail<input id="login-email" type="email" required autocomplete="email"></label><label>Senha<input id="login-password" type="password" required autocomplete="current-password"></label><button type="button" id="show-forgot" class="forgot-link">Esqueceu sua senha?</button><button>Entrar</button></form>
 <form id="forgot-form" class="hide"><h3>Recuperar senha</h3><p class="muted">Enviaremos um link para seu e-mail cadastrado.</p><label>E-mail<input id="forgot-email" type="email" required autocomplete="email"></label><button type="submit">Enviar link de recuperação</button></form>
 <form id="reset-form" class="hide"><h3>Definir nova senha</h3><label>Nova senha (mínimo 8 caracteres)<input id="reset-password" type="password" required minlength="8" autocomplete="new-password"></label><label>Confirmar nova senha<input id="reset-confirm" type="password" required minlength="8" autocomplete="new-password"></label><button type="submit">Salvar nova senha</button></form>
 <form id="register-form" class="hide"><label>Nome<input id="reg-name" required minlength="2" maxlength="100"></label><label>Apelido (opcional)<input id="reg-nick" maxlength="100"></label>
