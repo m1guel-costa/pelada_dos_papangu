@@ -94,6 +94,53 @@ h1{text-align:center;margin:14px 0 20px;letter-spacing:-.03em}
 .guest-item .stars{font-size:.9rem}
 .guest-item .guest-details{flex:1;min-width:0;overflow-wrap:anywhere}
 @media(max-width:480px){.guest-stars-label{flex:1 1 140px}.guest-box form button{width:100%;margin:0 0 10px}#participants .item{padding:10px 8px}}
+
+/* Refinamento visual premium: apenas apresentação, sem alterar lógica */
+:root{color-scheme:dark;--bg:#090f1d;--surface:#172339;--surface-2:#1e3048;--line:#34475e;--text:#f8fafc;--sub:#aab9cb;--green:#22c55e;--gold:#fbbf24}
+body{background:radial-gradient(ellipse 85% 350px at 50% -100px,#164e3b66,transparent),linear-gradient(155deg,#0b1426 0%,#090f1d 70%);color:var(--text);min-height:100dvh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:800px;padding-top:20px}
+h1{font-weight:850;letter-spacing:-.045em;text-shadow:0 4px 28px #fbbf2420;margin:12px 0 24px}
+h2{letter-spacing:-.025em;font-weight:800}
+.panel{background:linear-gradient(155deg,#1b2a42 0%,#162237 100%);border:1px solid #35465d;border-radius:20px;box-shadow:0 14px 38px #00000028, inset 0 1px #ffffff0a;padding:clamp(18px,4vw,28px)}
+button{position:relative;isolation:isolate;background:linear-gradient(135deg,#22c55e,#15803d);color:white;border:1px solid #ffffff20;border-radius:12px;font-weight:750;letter-spacing:.005em;box-shadow:0 4px 12px #0003, inset 0 1px #ffffff24;transition:transform .18s ease,box-shadow .18s ease,filter .18s ease,background .18s ease;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button.secondary{background:linear-gradient(135deg,#34465f,#26364d);border-color:#51617955}
+button:not(:disabled):hover{filter:brightness(1.13);transform:translateY(-2px);box-shadow:0 8px 20px #0005,0 0 0 1px #ffffff16}
+button:not(:disabled):active{transform:translateY(2px) scale(.97);filter:brightness(.94);box-shadow:inset 0 3px 8px #0004}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #fbbf24;outline-offset:3px}
+input,select{background:#0c1729;border:1px solid #43556e;border-radius:11px;color:#f8fafc;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
+input:hover,select:hover{border-color:#6583a3}
+input:focus,select:focus{border-color:#34d399;box-shadow:0 0 0 3px #22c55e22;background:#101e32;outline:none}
+label{font-weight:550}
+#app-nav{background:#0b1426ed;border:1px solid #34465a55;border-radius:16px;box-shadow:0 10px 30px #0004;padding:7px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+#app-nav .tab{background:transparent;border:1px solid transparent;border-radius:11px;box-shadow:none;color:#b9c7d8;transition:transform .18s ease,background .2s ease,color .2s ease,box-shadow .2s ease;font-weight:750}
+#app-nav .tab:hover{background:#2a3c55;color:#fff}
+#app-nav .tab.active{background:linear-gradient(145deg,#22a653,#146c3c);border:1px solid #47d47755;color:white;box-shadow:0 5px 14px #0d7e3d55,inset 0 1px #ffffff28}
+#app-nav .tab:active{transform:scale(.94)}
+#app-actions button{font-size:.82rem;border-radius:10px}
+.tab-panel:not(.hide){animation:panelEnter .32s cubic-bezier(.2,.7,.2,1) both}
+@keyframes panelEnter{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+#ranking .item{background:linear-gradient(120deg,#20304a,#17243a);border-color:#3a4e68;border-radius:14px;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+#ranking .item:hover{transform:translateY(-2px);border-color:#5b7898;box-shadow:0 7px 18px #0003}
+#ranking .item:first-child{border-color:#a77c2980;background:linear-gradient(110deg,#42391e88,#1c2b43 70%);box-shadow:inset 3px 0 #eab308}
+#ranking .stars,.stars{color:var(--gold);text-shadow:0 0 12px #facc1522}
+.avatar{border:2px solid #ffffff2b;box-shadow:0 3px 10px #0005}
+#participants .item{background:#17253a;border-color:#354a61;border-radius:13px;transition:background .18s ease,border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+#participants .item:hover{border-color:#64809d;transform:translateY(-1px)}
+#participants .item:has(input:checked){background:linear-gradient(110deg,#16402e,#172c38);border-color:#3ecb78;box-shadow:inset 3px 0 #22c55e,0 0 0 1px #22c55e18}
+#participants input[type=checkbox]{width:23px;height:23px;accent-color:#22c55e}
+.guest-box{background:linear-gradient(145deg,#102238,#101b2d);border-radius:16px;border-color:#40546c}
+.guest-item{padding:12px 0}
+.guest-item button{background:linear-gradient(135deg,#a63333,#762323);box-shadow:none}
+#draw{width:100%;padding:16px 20px;font-size:1.05rem;min-height:54px;box-shadow:0 8px 22px #16a34a38}
+#draw-result .panel{border-color:#3b8061;background:linear-gradient(145deg,#153c33,#172b3b)}
+#message:not(:empty){border:1px solid #4b617b;background:#24354b;border-radius:12px;animation:panelEnter .25s ease both}
+#message.error{background:#482226;border-color:#9d4747}
+#admin-list .item{background:#17263c;border:1px solid #344a64;border-radius:12px;margin:9px 0;padding:12px}
+#auth nav button{min-height:50px}
+#profile-form>button,#register-form>button,#login-form>button,#forgot-form>button,#reset-form>button{min-height:50px}
+@media(max-width:480px){.wrap{padding:12px 12px 44px}.panel{padding:17px;border-radius:16px}#app-nav{gap:3px;padding:5px}#app-nav .tab{font-size:.69rem;min-height:52px;padding:6px 2px}#ranking .item{padding:12px}#draw{font-size:1rem}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style></head><body><div class="wrap">
 <h1>⚽ Pelada dos Papangu</h1><p id="message" aria-live="polite"></p>
 <section id="setup" class="panel hide"><h2>Configuração pendente</h2><p>O administrador precisa configurar o Supabase em <code>supabase-config.js</code>.</p></section>
