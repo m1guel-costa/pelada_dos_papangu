@@ -6,11 +6,33 @@ const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>
 let db,session,me,players=[];
 let pendingRegistrationPhoto=null;
 const PHOTO_BUCKET='player-photos';
-const PHOTO_TYPES=['image/jpeg','image/png','image/webp'];
-function validatePhoto(file){if(!file)return null;if(!PHOTO_TYPES.includes(file.type))throw Error('Escolha uma imagem JPG, PNG ou WebP.');if(file.size>2*1024*1024)throw Error('A foto deve ter no máximo 2 MB.');return file;}
+const PHOTO_TYPES=['image/jpeg','image/png','image/webp','image/heic','image/heif'];
+function validatePhoto(file){if(!file)return null;if(!PHOTO_TYPES.includes(file.type)&&!/^image\//.test(file.type))throw Error('Escolha uma foto da galeria.');return file;}
+async function optimizePhoto(file){
+ validatePhoto(file);if(!file)return null;
+ const url=URL.createObjectURL(file);
+ try{
+  const image=new Image();image.src=url;
+  await image.decode();
+  let scale=Math.min(1,1600/Math.max(image.naturalWidth,image.naturalHeight));
+  for(let attempt=0;attempt<8;attempt++){
+   const canvas=document.createElement('canvas');
+   canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));
+   canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
+   canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);
+   const quality=Math.max(.55,.88-attempt*.06);
+   const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',quality));
+   if(!blob)throw Error('Não foi possível preparar esta imagem.');
+   if(blob.size<=2*1024*1024)return new File([blob],'foto.jpg',{type:'image/jpeg'});
+   scale*=.8;
+  }
+  throw Error('Não foi possível reduzir a foto. Tente outra imagem.');
+ }catch(e){throw Error('Não foi possível processar a foto neste navegador. Tente JPG ou PNG.');}
+ finally{URL.revokeObjectURL(url);}
+}
 function photoUrl(path){if(!path)return '';const {data}=db.storage.from(PHOTO_BUCKET).getPublicUrl(path);return data.publicUrl+'?v='+Date.now();}
 function avatarHtml(p){const url=p.foto_path?photoUrl(p.foto_path):'';return url?'<img class="avatar" loading="lazy" src="'+esc(url)+'" alt="Foto de '+esc(p.nome)+'">':'<span class="avatar" aria-hidden="true" style="display:grid;place-items:center">⚽</span>';}
-async function uploadPhoto(file){validatePhoto(file);if(!file||!session?.user)return false;const path=session.user.id+'/avatar.'+file.type.split('/')[1].replace('jpeg','jpg');const {error}=await db.storage.from(PHOTO_BUCKET).upload(path,file,{upsert:true,contentType:file.type});if(error)throw error;const {error:e}=await db.from('players').update({foto_path:path}).eq('id',session.user.id);if(e)throw e;return true;}
+async function uploadPhoto(file){if(!file||!session?.user)return false;file=await optimizePhoto(file);const path=session.user.id+'/avatar.jpg';const {error}=await db.storage.from(PHOTO_BUCKET).upload(path,file,{upsert:true,contentType:file.type});if(error)throw error;const {error:e}=await db.from('players').update({foto_path:path}).eq('id',session.user.id);if(e)throw e;return true;}
 function previewFile(input,img){const file=input.files?.[0];if(!file){show(img,false);return;}try{validatePhoto(file);$(img).src=URL.createObjectURL(file);show(img);}catch(e){input.value='';show(img,false);msg(e.message,true);}}
 $('reg-photo').onchange=()=>previewFile($('reg-photo'),'reg-photo-preview');
 $('profile-photo').onchange=()=>previewFile($('profile-photo'),'profile-photo-preview');
