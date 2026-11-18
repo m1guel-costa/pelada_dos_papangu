@@ -179,7 +179,7 @@ body::after{display:none!important}
 .panel{background:rgba(22,35,55,.88)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 #app-nav{background:rgba(11,20,38,.9)!important}
 @media(max-width:480px){body::before{background-position:center,center 43%!important}.panel{background:rgba(22,35,55,.91)!important}}
-</style></head><body><div class="wrap">
+#papangu-mascot{position:fixed;right:10px;bottom:calc(18px + env(safe-area-inset-bottom,0px));width:clamp(90px,18vw,145px);height:auto;max-height:32vh;object-fit:contain;object-position:bottom;z-index:50;pointer-events:none;opacity:.78;filter:drop-shadow(0 4px 12px rgba(0,0,0,.65))}@media(max-width:480px){#papangu-mascot{right:5px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:94px;max-height:23vh;opacity:.68}}</style></head><body><div class="wrap">
 <h1>⚽ Pelada dos Papangu</h1><p id="message" aria-live="polite"></p>
 <section id="setup" class="panel hide"><h2>Configuração pendente</h2><p>O administrador precisa configurar o Supabase em <code>supabase-config.js</code>.</p></section>
 <section id="auth" class="panel hide"><h2>Entrar ou cadastrar</h2>
@@ -207,4 +207,4 @@ body::after{display:none!important}
 <label>Jogadores por time<input id="team-size" type="number" min="2" max="15" value="5"></label><h3>Mensalistas presentes <span id="selected-count" class="count">0 selecionados</span></h3><div id="participants"></div><div class="guest-box"><h3>+ Adicionar diarista</h3><form id="guest-form"><label>Nome do diarista<input id="guest-name" maxlength="80" placeholder="Ex.: Lucas" required></label><label class="guest-stars-label">Avaliação<select id="guest-stars" aria-label="Estrelas do diarista"><option value="1">★☆☆☆☆ · 1 estrela</option><option value="2">★★☆☆☆ · 2 estrelas</option><option value="3" selected>★★★☆☆ · 3 estrelas</option><option value="4">★★★★☆ · 4 estrelas</option><option value="5">★★★★★ · 5 estrelas</option></select></label><button type="submit">Adicionar diarista</button></form><div id="guest-list"></div></div><p id="draw-summary" class="muted"></p>
 <button id="draw">Sortear times equilibrados</button><div id="draw-result"></div></section>
 <section id="admin" class="panel tab-panel hide"><h2>⭐ Avaliação dos mensalistas</h2><p class="muted">Somente o administrador pode atribuir estrelas. O ranking é atualizado automaticamente.</p><div id="admin-list"></div></section></section>
-</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="supabase-config.js"></script><script src="app.js"></script></body></html>
+</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="supabase-config.js"></script><script src="app.js"></script><img id="papangu-mascot" src="assets/papangu-logo.webp" alt="" aria-hidden="true" onerror="this.style.display='none'"></body></html>
