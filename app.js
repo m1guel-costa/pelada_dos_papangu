@@ -2,6 +2,11 @@
 const $ = id => document.getElementById(id);
 const show = (id,yes=true) => $(id).classList.toggle('hide',!yes);
 const msg = (s,err=false) => { $('message').textContent=s; $('message').className=err?'error':''; };
+const authErrorMessage = error => {
+ const raw=String(error?.message||'Erro desconhecido');
+ if(/email rate limit exceeded|email.*rate.*limit|over_email_send_rate_limit/i.test(raw))return 'O serviço de e-mail do Supabase atingiu o limite temporário de envios. Aguarde a liberação ou configure um servidor SMTP próprio no painel do Supabase. Não é necessário refazer o cadastro várias vezes.';
+ return raw;
+};
 const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let db,session,me,players=[];
 let pendingRegistrationPhoto=null;
@@ -66,7 +71,7 @@ $('forgot-form').onsubmit=async e=>{
  const email=$('forgot-email').value.trim();
  const redirectTo=window.location.origin+window.location.pathname;
  const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo});
- msg(error?'Não foi possível enviar o link: '+error.message:'Se esse e-mail estiver cadastrado, você receberá um link para criar outra senha. Verifique também o spam.',!!error);
+ msg(error?'Não foi possível enviar o link: '+authErrorMessage(error):'Se esse e-mail estiver cadastrado, você receberá um link para criar outra senha. Verifique também o spam.',!!error);
 };
 $('reset-form').onsubmit=async e=>{
  e.preventDefault();
@@ -79,12 +84,12 @@ $('reset-form').onsubmit=async e=>{
  msg('Senha alterada com sucesso! Você já pode entrar com a nova senha.');
  await db.auth.signOut();
 };
-$('login-form').onsubmit=async e=>{e.preventDefault();const {error}=await db.auth.signInWithPassword({email:$('login-email').value.trim(),password:$('login-password').value});msg(error?error.message:'Login realizado.',!!error)};
+$('login-form').onsubmit=async e=>{e.preventDefault();const {error}=await db.auth.signInWithPassword({email:$('login-email').value.trim(),password:$('login-password').value});msg(error?authErrorMessage(error):'Login realizado.',!!error)};
 $('register-form').onsubmit=async e=>{
  e.preventDefault();
  try{pendingRegistrationPhoto=validatePhoto($('reg-photo').files?.[0]);}catch(err){msg(err.message,true);return;}
  const {data,error}=await db.auth.signUp({email:$('reg-email').value.trim(),password:$('reg-password').value,options:{data:{nome:$('reg-name').value.trim(),apelido:$('reg-nick').value.trim(),posicao:$('reg-position').value}}});
- if(error){pendingRegistrationPhoto=null;msg(error.message,true);return;}
+ if(error){pendingRegistrationPhoto=null;msg(authErrorMessage(error),true);return;}
  msg(data.session?'Conta criada!':'Cadastro recebido! Confira seu e-mail para confirmar a conta. A foto será enviada ao entrar neste navegador; caso contrário, adicione-a no perfil.');
 };
 $('logout').onclick=async()=>{await db.auth.signOut();msg('Você saiu da conta.')};
