@@ -16,8 +16,8 @@ let activeTab='ranking-section';
 function selectTab(id){if(id==='admin'&&me?.role!=='admin')id='ranking-section';activeTab=id;document.querySelectorAll('.tab-panel').forEach(p=>show(p.id,p.id===id));document.querySelectorAll('#app-nav .tab').forEach(b=>{const selected=b.dataset.tab===id;b.classList.toggle('active',selected);b.setAttribute('aria-selected',String(selected));});window.scrollTo({top:0,behavior:'instant'});}
 document.querySelectorAll('#app-nav .tab').forEach(b=>b.addEventListener('click',()=>selectTab(b.dataset.tab)));
 function updateDrawSummary(){const checked=document.querySelectorAll('.participant:checked').length;const total=checked+guests.length;$('selected-count').textContent=checked+' selecionado'+(checked===1?'':'s');$('draw-summary').textContent=checked+' mensalista(s) + '+guests.length+' diarista(s) = '+total+' jogador(es) para o sorteio.';}
-function renderGuests(){$('guest-list').innerHTML=guests.map((name,i)=>'<div class="guest-item"><span>⚽ '+esc(name)+' <small>(diarista)</small></span><button type="button" data-guest="'+i+'" aria-label="Remover '+esc(name)+'">Remover</button></div>').join('');document.querySelectorAll('[data-guest]').forEach(b=>b.onclick=()=>{guests.splice(Number(b.dataset.guest),1);renderGuests();});updateDrawSummary();}
-$('guest-form').onsubmit=e=>{e.preventDefault();const name=$('guest-name').value.trim();if(!name)return;if(guests.length>=60)return msg('Limite de 60 diaristas por sorteio.',true);guests.push(name);$('guest-name').value='';renderGuests();};
+function renderGuests(){$('guest-list').innerHTML=guests.map((g,i)=>'<div class="guest-item"><span class="guest-details">⚽ '+esc(g.nome)+' <small>· Diarista</small><br><span class="stars">'+'★'.repeat(g.estrelas)+'☆'.repeat(5-g.estrelas)+'</span></span><button type="button" data-guest="'+i+'" aria-label="Remover '+esc(g.nome)+'">Remover</button></div>').join('');document.querySelectorAll('[data-guest]').forEach(b=>b.onclick=()=>{guests.splice(Number(b.dataset.guest),1);renderGuests();});updateDrawSummary();}
+$('guest-form').onsubmit=e=>{e.preventDefault();const name=$('guest-name').value.trim();if(!name)return;if(guests.length>=60)return msg('Limite de 60 diaristas por sorteio.',true);guests.push({nome:name,estrelas:Number($('guest-stars').value)});$('guest-name').value='';$('guest-stars').value='3';renderGuests();};
 $('participants').addEventListener('change',updateDrawSummary);
 const PHOTO_BUCKET='player-photos';
 const PHOTO_TYPES=['image/jpeg','image/png','image/webp','image/heic','image/heif'];
@@ -111,7 +111,7 @@ async function refresh(){
  if(error){msg(error.message,true);return;}players=data||[];
  $('ranking').innerHTML=players.length?players.map((p,i)=>'<div class="item"><span class="player-info">'+avatarHtml(p)+'<span>'+(i+1)+'. <b>'+esc(p.nome)+'</b> '+(p.apelido?'('+esc(p.apelido)+')':'')+'<br><small>'+esc(p.posicao)+'</small></span></span><span class="stars">'+ '★'.repeat(p.estrelas)+'☆'.repeat(5-p.estrelas)+'</span></div>').join(''):'Nenhum jogador cadastrado ainda.';
  const checkedIds=new Set([...document.querySelectorAll('.participant:checked')].map(el=>el.value));
- $('participants').innerHTML=players.map(p=>'<label class="item"><span>'+esc(p.nome)+' — '+esc(p.posicao)+'</span><input type="checkbox" class="participant" value="'+esc(p.id)+'" '+(checkedIds.has(p.id)?'checked':'')+' style="width:auto"></label>').join('');
+ $('participants').innerHTML=players.map(p=>'<label class="item"><span class="participant-name">'+esc(p.nome)+'<small>'+esc(p.posicao)+'</small></span><span class="participant-stars" aria-label="'+p.estrelas+' de 5 estrelas">'+'★'.repeat(p.estrelas)+'☆'.repeat(5-p.estrelas)+'</span><input type="checkbox" class="participant" value="'+esc(p.id)+'" '+(checkedIds.has(p.id)?'checked':'')+' style="width:auto"></label>').join('');
  updateDrawSummary();
  if(me?.role==='admin') $('admin-list').innerHTML=players.map(p=>'<div class="item"><span>'+esc(p.nome)+' — '+esc(p.posicao)+'</span><label>Estrelas <select class="rating" data-id="'+esc(p.id)+'">'+[1,2,3,4,5].map(n=>'<option value="'+n+'" '+(p.estrelas===n?'selected':'')+'>'+n+' ★</option>').join('')+'</select></label></div>').join('');
  document.querySelectorAll('.rating').forEach(el=>el.onchange=async()=>{
@@ -121,7 +121,7 @@ async function refresh(){
 }
 $('draw').onclick=()=>{
  const monthly=[...document.querySelectorAll('.participant:checked')].map(x=>players.find(p=>p.id===x.value)).filter(Boolean);
- const visitors=guests.map((nome,i)=>({id:'guest-'+i,nome,posicao:'Diarista',estrelas:3,guest:true}));
+ const visitors=guests.map((g,i)=>({id:'guest-'+i,nome:g.nome,posicao:'Diarista',estrelas:g.estrelas,guest:true}));
  const selected=[...monthly,...visitors];
  const n=Number($('team-count').value),size=Number($('team-size').value);
  if(!Number.isInteger(n)||n<2||n>6||!Number.isInteger(size)||size<2||size>15){msg('Confira o número de times e jogadores.',true);return;}
@@ -131,7 +131,7 @@ $('draw').onclick=()=>{
  const shuffled=[...selected].map(p=>({p,r:Math.random()})).sort((a,b)=>b.p.estrelas-a.p.estrelas||a.r-b.r).map(x=>x.p);
  const teams=Array.from({length:n},()=>[]);
  shuffled.forEach((p,i)=>{const round=Math.floor(i/n),idx=i%n,team=round%2===0?idx:n-1-idx;teams[team].push(p);});
- $('draw-result').innerHTML=teams.map((t,i)=>'<div class="panel"><h3>⚽ Time '+(i+1)+'</h3>'+t.map(p=>'<p>'+esc(p.nome)+(p.guest?' <small>· Diarista</small>':' <span class="stars">'+ '★'.repeat(p.estrelas)+'</span>')+'</p>').join('')+'</div>').join('');
+ $('draw-result').innerHTML=teams.map((t,i)=>'<div class="panel"><h3>⚽ Time '+(i+1)+'</h3>'+t.map(p=>'<p>'+esc(p.nome)+(p.guest?' <small>· Diarista</small>':'')+' <span class="stars">'+ '★'.repeat(p.estrelas)+'☆'.repeat(5-p.estrelas)+'</span></p>').join('')+'</div>').join('');
  msg('Times sorteados! Diaristas foram incluídos apenas neste sorteio.');
  $('draw-result').scrollIntoView({behavior:'smooth',block:'start'});
 };
