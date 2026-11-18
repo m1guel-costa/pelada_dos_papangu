@@ -5,6 +5,7 @@ const msg = (s,err=false) => { $('message').textContent=s; $('message').classNam
 const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let db,session,me,players=[];
 let pendingRegistrationPhoto=null;
+let recoveryMode=false;
 const PHOTO_BUCKET='player-photos';
 const PHOTO_TYPES=['image/jpeg','image/png','image/webp','image/heic','image/heif'];
 function validatePhoto(file){if(!file)return null;if(!PHOTO_TYPES.includes(file.type)&&!/^image\//.test(file.type))throw Error('Escolha uma foto da galeria.');return file;}
@@ -40,13 +41,13 @@ const configured = window.PAPANGU_SUPABASE_URL?.startsWith('https://') && window
 if (!configured || !window.supabase) show('setup');
 else {
  db=window.supabase.createClient(window.PAPANGU_SUPABASE_URL,window.PAPANGU_SUPABASE_ANON_KEY);
- db.auth.onAuthStateChange((_event,s)=>{session=s;setTimeout(()=>boot(),0);});
+ db.auth.onAuthStateChange((event,s)=>{session=s;if(event==='PASSWORD_RECOVERY'){recoveryMode=true;show('auth');show('app',false);showAuthForm('reset-form');msg('Crie uma nova senha para recuperar sua conta.');return;}setTimeout(()=>boot(),0);});
  boot();
 }
 async function boot(){
  try {
   const {data:{session:s},error}=await db.auth.getSession(); if(error) throw error;
-  session=s; show('auth',!s);show('app',!!s);if(!s){me=null;return;}
+  session=s;if(recoveryMode){show('auth');show('app',false);showAuthForm('reset-form');return;}show('auth',!s);show('app',!!s);if(!s){me=null;return;}
   const {data,error:e}=await db.from('players').select('*').eq('id',s.user.id).single();if(e)throw e;
   me=data;show('admin',me.role==='admin');
   if(pendingRegistrationPhoto){try{await uploadPhoto(pendingRegistrationPhoto);pendingRegistrationPhoto=null;const {data:updated}=await db.from('players').select('*').eq('id',s.user.id).single();if(updated)me=updated;}catch(e){msg('Conta criada, mas não foi possível enviar a foto: '+e.message,true);pendingRegistrationPhoto=null;}}
@@ -56,8 +57,28 @@ async function boot(){
   await refresh();
  }catch(e){msg('Erro ao carregar: '+e.message,true);}
 }
-$('show-login').onclick=()=>{show('login-form');show('register-form',false)};
-$('show-register').onclick=()=>{show('login-form',false);show('register-form')};
+function showAuthForm(id){for(const form of ['login-form','register-form','forgot-form','reset-form'])show(form,form===id);}
+$('show-login').onclick=()=>{if(recoveryMode)return msg('Defina sua nova senha antes de entrar.',true);showAuthForm('login-form');};
+$('show-register').onclick=()=>{if(recoveryMode)return msg('Defina sua nova senha antes de criar outra conta.',true);showAuthForm('register-form');};
+$('show-forgot').onclick=()=>{if(recoveryMode)return msg('Defina sua nova senha no formulário abaixo.',true);$('forgot-email').value=$('login-email').value;showAuthForm('forgot-form');};
+$('forgot-form').onsubmit=async e=>{
+ e.preventDefault();
+ const email=$('forgot-email').value.trim();
+ const redirectTo=window.location.origin+window.location.pathname;
+ const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo});
+ msg(error?'Não foi possível enviar o link: '+error.message:'Se esse e-mail estiver cadastrado, você receberá um link para criar outra senha. Verifique também o spam.',!!error);
+};
+$('reset-form').onsubmit=async e=>{
+ e.preventDefault();
+ const password=$('reset-password').value;
+ if(password!==$('reset-confirm').value)return msg('As duas senhas precisam ser iguais.',true);
+ if(password.length<8)return msg('A senha deve ter pelo menos 8 caracteres.',true);
+ const {error}=await db.auth.updateUser({password});
+ if(error)return msg('Não foi possível alterar a senha: '+error.message,true);
+ recoveryMode=false;$('reset-form').reset();showAuthForm('login-form');
+ msg('Senha alterada com sucesso! Você já pode entrar com a nova senha.');
+ await db.auth.signOut();
+};
 $('login-form').onsubmit=async e=>{e.preventDefault();const {error}=await db.auth.signInWithPassword({email:$('login-email').value.trim(),password:$('login-password').value});msg(error?error.message:'Login realizado.',!!error)};
 $('register-form').onsubmit=async e=>{
  e.preventDefault();
