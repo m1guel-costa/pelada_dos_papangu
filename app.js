@@ -25,7 +25,7 @@ const OFFICIAL_CARDS={"nilso":{"overall":85,"vel":65,"chu":83,"pas":85,"dri":60,
 const CARD_ALIASES={'leo 22':'leo','leonardo':'leo','rapha':'raphael','joao henrique':'joão h','lucas b':'lucas b','lucas branco':'lucas b','luca branco':'lucas b','lucas b.':'lucas b','lucas almeida':'lukinha','lucas':'lukinha','lukinhas':'lukinha','math':'math','matheus':'math','cadoca':'cadoca','carlos almeida':'cadoca','miguel costa':'miguel','croa':'miguel','mocir roberto':'moa','moacir':'moa','moacir roberto':'moa','mocir':'moa','nilson':'nilso','caua luna':'luna','caua':'luna','hebert da silva vieira':'heberth','hebert':'heberth','gareldo mel':'garel','gareldo':'garel','bruno rodrigues':'garel','brunao':'garel','bebeto':'heberth'};
 function cardKey(s){return String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
 const OFFICIAL_BY_KEY=Object.fromEntries(Object.entries(OFFICIAL_CARDS).map(([k,v])=>[cardKey(k),v]));
-function officialCardFor(p){const names=[p.apelido,p.nome].map(cardKey).filter(Boolean);if(names.some(n=>n==='viana'||n.startsWith('viana ')||n.endsWith(' viana')))return null;for(const key of names){const lookup=CARD_ALIASES[key]||key;const found=OFFICIAL_BY_KEY[cardKey(lookup)];if(found)return found;}return null;}
+function officialCardFor(p){const names=[p.apelido,p.nome].map(cardKey).filter(Boolean);if(names.some(n=>n==='viana'||n.startsWith('viana ')||n.endsWith(' viana')))return OFFICIAL_BY_KEY['mv'];for(const key of names){const lookup=CARD_ALIASES[key]||key;const found=OFFICIAL_BY_KEY[cardKey(lookup)];if(found)return found;}return null;}
 
 function cardOverall(st){return st?.overall??null;}
 function cardHtml(p){
