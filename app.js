@@ -178,7 +178,7 @@ function openDrawScreen(){
 }
 function restoreDrawResult(){
  try{const saved=JSON.parse(localStorage.getItem(DRAW_SAVED_KEY)||'null');if(!saved?.html)return false;
- $('draw-result').innerHTML=saved.html;
+ $('draw-result').innerHTML=saved.html.replace(/(<article class="(?:draw-mini-fifa draw-mini-elite|papangu-card papangu-card-special)"[^>]*>)(?!<div class="toty-crystals")/g,'$1<div class="toty-crystals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>');
  $('draw').textContent='Ver resultado do sorteio';
  $('draw').dataset.locked='true';
  return true;}catch(e){return false;}
