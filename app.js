@@ -17,6 +17,32 @@ function selectTab(id){if(id==='admin'&&me?.role!=='admin')id='ranking-section';
 document.querySelectorAll('#app-nav .tab').forEach(b=>b.addEventListener('click',()=>selectTab(b.dataset.tab)));
 function updateDrawSummary(){const checked=document.querySelectorAll('.participant:checked').length;const total=checked+guests.length;$('selected-count').textContent=checked+' selecionado'+(checked===1?'':'s');$('draw-summary').textContent=checked+' mensalista(s) + '+guests.length+' diarista(s) = '+total+' jogador(es) para o sorteio.';}
 function starsHtml(value){const n=Math.max(0,Math.min(5,Number(value)||0));const full=Math.floor(n),half=n-full>=0.5;return '<span aria-label="'+n.toLocaleString('pt-BR')+' de 5 estrelas">'+'★'.repeat(full)+(half?'<span class="half-star">★</span>':'')+'☆'.repeat(5-full-(half?1:0))+' <small class="star-score">'+n.toFixed(1).replace('.',',')+'</small></span>';}
+
+// Cartinhas Papangu: estatísticas independentes das estrelas do ranking.
+const CARD_FIELDS=[['vel','VEL'],['chu','CHU'],['pas','PAS'],['dri','DRI'],['def','DEF'],['fis','FIS']];
+let cardStats={};
+function cardOverall(st){return st&&CARD_FIELDS.every(([k])=>Number.isFinite(Number(st[k])))?Math.round(CARD_FIELDS.reduce((a,[k])=>a+Number(st[k]),0)/6):null;}
+function cardHtml(p){
+ const st=cardStats[p.id]||null,overall=cardOverall(st),url=p.foto_path?photoUrl(p.foto_path):'';
+ const name=esc(p.apelido||p.nome),pos=esc(p.posicao||'Jogador');
+ return '<article class="papangu-card" aria-label="Cartinha de '+esc(p.nome)+'"><div class="card-top"><div class="card-overall">'+(overall??'—')+'<small>GER</small><span>'+pos+'</span></div><div class="card-portrait">'+(url?'<img loading="lazy" src="'+esc(url)+'" alt="Foto de '+esc(p.nome)+'">':'<span aria-hidden="true">⚽</span>')+'</div></div><div class="card-name">'+name+'</div><div class="card-divider"></div><div class="card-stats">'+CARD_FIELDS.map(([k,label])=>'<div><b>'+(st?.[k]??'—')+'</b><span>'+label+'</span></div>').join('')+'</div><div class="card-footer">⚽ PELADA DOS PAPANGU</div></article>';
+}
+function openPlayerCard(id){
+ const p=players.find(x=>x.id===id);if(!p)return;
+ $('card-modal-title').textContent=p.nome;
+ $('card-modal-content').innerHTML=cardHtml(p);
+ $('card-modal').classList.remove('hide');
+}
+$('card-modal-close').onclick=()=>show('card-modal',false);
+$('card-modal').addEventListener('click',e=>{if(e.target===$('card-modal'))show('card-modal',false);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')show('card-modal',false);});
+$('ranking').addEventListener('click',e=>{const b=e.target.closest('[data-card-id]');if(b)openPlayerCard(b.dataset.cardId);});
+$('my-card-button').onclick=()=>{if(me)openPlayerCard(me.id);};
+async function loadCardStats(){
+ const {data,error}=await db.from('player_cards').select('player_id,vel,chu,pas,dri,def,fis');
+ if(error){cardStats={};return;}
+ cardStats=Object.fromEntries((data||[]).map(x=>[x.player_id,x]));
+}
 function renderGuests(){$('guest-list').innerHTML=guests.map((g,i)=>'<div class="guest-item"><span class="guest-details">⚽ '+esc(g.nome)+' <small>· Diarista</small><br><span class="stars">'+starsHtml(g.estrelas)+'</span></span><button type="button" data-guest="'+i+'" aria-label="Remover '+esc(g.nome)+'">Remover</button></div>').join('');document.querySelectorAll('[data-guest]').forEach(b=>b.onclick=()=>{guests.splice(Number(b.dataset.guest),1);renderGuests();});updateDrawSummary();}
 $('guest-form').onsubmit=e=>{e.preventDefault();const name=$('guest-name').value.trim();if(!name)return;if(guests.length>=60)return msg('Limite de 60 diaristas por sorteio.',true);guests.push({nome:name,estrelas:Number($('guest-stars').value)});$('guest-name').value='';$('guest-stars').value='3';renderGuests();};
 $('participants').addEventListener('change',updateDrawSummary);
@@ -109,8 +135,8 @@ $('profile-form').onsubmit=async e=>{
 $('refresh').onclick=refresh;
 async function refresh(){
  const {data,error}=await db.from('players').select('id,nome,apelido,posicao,estrelas,role,foto_path').order('estrelas',{ascending:false});
- if(error){msg(error.message,true);return;}players=data||[];
- $('ranking').innerHTML=players.length?players.map((p,i)=>'<div class="item"><span class="player-info">'+avatarHtml(p)+'<span>'+(i+1)+'. <b>'+esc(p.nome)+'</b> '+(p.apelido?'('+esc(p.apelido)+')':'')+'<br><small>'+esc(p.posicao)+'</small></span></span><span class="stars">'+ starsHtml(p.estrelas)+'</span></div>').join(''):'Nenhum jogador cadastrado ainda.';
+ if(error){msg(error.message,true);return;}players=data||[];await loadCardStats();
+ $('ranking').innerHTML=players.length?players.map((p,i)=>'<div class="item"><button type="button" class="card-open" data-card-id="'+esc(p.id)+'" aria-label="Ver cartinha de '+esc(p.nome)+'"><span class="player-info">'+avatarHtml(p)+'<span>'+(i+1)+'. <b>'+esc(p.nome)+'</b> '+(p.apelido?'('+esc(p.apelido)+')':'')+'<br><small>'+esc(p.posicao)+'</small></span></span></button><span class="stars">'+ starsHtml(p.estrelas)+'</span></div>').join(''):'Nenhum jogador cadastrado ainda.';
  const checkedIds=new Set([...document.querySelectorAll('.participant:checked')].map(el=>el.value));
  $('participants').innerHTML=players.map(p=>'<label class="item"><span class="participant-name">'+esc(p.nome)+'<small>'+esc(p.posicao)+'</small></span><span class="participant-stars" aria-label="'+p.estrelas+' de 5 estrelas">'+starsHtml(p.estrelas)+'</span><input type="checkbox" class="participant" value="'+esc(p.id)+'" '+(checkedIds.has(p.id)?'checked':'')+' style="width:auto"></label>').join('');
  updateDrawSummary();
@@ -133,7 +159,7 @@ $('draw').onclick=()=>{
  const shuffled=[...selected].map(p=>({p,r:Math.random()})).sort((a,b)=>b.p.estrelas-a.p.estrelas||a.r-b.r).map(x=>x.p);
  const teams=Array.from({length:n},()=>[]);
  shuffled.forEach((p,i)=>{const round=Math.floor(i/n),idx=i%n,team=round%2===0?idx:n-1-idx;teams[team].push(p);});
- $('draw-result').innerHTML=teams.map((t,i)=>'<div class="panel"><h3>⚽ Time '+(i+1)+'</h3>'+t.map(p=>'<p>'+esc(p.nome)+(p.guest?' <small>· Diarista</small>':'')+' <span class="stars">'+ starsHtml(p.estrelas)+'</span></p>').join('')+'</div>').join('');
+ $('draw-result').innerHTML=teams.map((t,i)=>'<div class="panel"><h3>⚽ Time '+(i+1)+'</h3>'+'<div class="team-cards">'+t.map(p=>p.guest?'<div class="guest-card">⚽<b>'+esc(p.nome)+'</b><small>Diarista · '+String(p.estrelas).replace('.',',')+' ★</small><span>Estatísticas pendentes</span></div>':cardHtml(p)).join('')+'</div>'+'</div>').join('');
  msg('Times sorteados! Diaristas foram incluídos apenas neste sorteio.');
  $('draw-result').scrollIntoView({behavior:'smooth',block:'start'});
 };
