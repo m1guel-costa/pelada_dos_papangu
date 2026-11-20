@@ -42,6 +42,11 @@ function cardHtml(p){
  const name=esc(p.apelido||p.nome),pos=esc(positionAbbr(p.posicao)),tier=cardTier(p),special=tier==='gold'&&Number(overall)>=90;
  return '<article class="papangu-card papangu-card-'+tier+(special?' papangu-card-special':'')+'" aria-label="Cartinha de '+esc(p.nome)+'">'+(special?'<div class="toty-crystals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>':'')+'<div class="card-top"><div class="card-overall">'+(overall??'—')+'<small>GER</small><span>'+pos+'</span></div><div class="card-portrait">'+(url?'<img loading="lazy" src="'+esc(url)+'" alt="Foto de '+esc(p.nome)+'">':'<span aria-hidden="true">⚽</span>')+'</div></div><div class="card-name">'+name+'</div><div class="card-divider"></div><div class="card-stats">'+CARD_FIELDS.map(([k,label])=>'<div><b>'+(st?.[k]??'—')+'</b><span>'+label+'</span></div>').join('')+'</div><div class="card-footer">⚽ PELADA DOS PAPANGU</div></article>';
 }
+function rankingMiniCard(p){
+ const st=officialCardFor(p)||cardStats[p.id]||null,overall=cardOverall(st),elite=Number(overall)>=90;
+ const photo=p.foto_path?'<img loading="lazy" src="'+esc(photoUrl(p.foto_path))+'" alt="">':'<span>⚽</span>';
+ return '<span class="rank-mini-card'+(elite?' rank-mini-toty':'')+'"><strong>'+(overall??'—')+'</strong><span class="rank-mini-photo">'+photo+'</span><small>'+esc(positionAbbr(p.posicao))+'</small></span>';
+}
 function compactDrawCard(p){
  const st=officialCardFor(p)||cardStats[p.id]||null,overall=cardOverall(st),tier=cardTier(p),elite=tier==='gold'&&Number(overall)>=90;
  const photo=p.foto_path?'<img src="'+esc(photoUrl(p.foto_path))+'" alt="" loading="lazy">':'<span>⚽</span>';
@@ -158,7 +163,7 @@ $('refresh').onclick=refresh;
 async function refresh(){
  const {data,error}=await db.from('players').select('id,nome,apelido,posicao,estrelas,role,foto_path').order('estrelas',{ascending:false});
  if(error){msg(error.message,true);return;}players=data||[];await loadCardStats();
- $('ranking').innerHTML=players.length?players.map((p,i)=>'<button type="button" class="ranking-card-entry" data-card-id="'+esc(p.id)+'" aria-label="Abrir cartinha de '+esc(p.nome)+'"><span class="ranking-place">#'+(i+1)+'</span><span class="ranking-full-card">'+cardHtml(p)+'</span><span class="ranking-rating">'+starsHtml(p.estrelas)+'</span></button>').join(''):'Nenhum jogador cadastrado ainda.';
+ $('ranking').innerHTML=players.length?players.map((p,i)=>'<div class="item ranking-row"><button type="button" class="card-open" data-card-id="'+esc(p.id)+'" aria-label="Ver cartinha de '+esc(p.nome)+'"><span class="player-info">'+rankingMiniCard(p)+'<span>'+(i+1)+'. <b>'+esc(p.nome)+'</b> '+(p.apelido?'('+esc(p.apelido)+')':'')+'<br><small>'+esc(p.posicao)+'</small></span></span></button><span class="stars">'+starsHtml(p.estrelas)+'</span></div>').join(''):'Nenhum jogador cadastrado ainda.';
  const checkedIds=new Set([...document.querySelectorAll('.participant:checked')].map(el=>el.value));
  $('participants').innerHTML=players.map(p=>'<label class="item"><span class="participant-name">'+esc(p.nome)+'<small>'+esc(p.posicao)+'</small></span><span class="participant-stars" aria-label="'+p.estrelas+' de 5 estrelas">'+starsHtml(p.estrelas)+'</span><input type="checkbox" class="participant" value="'+esc(p.id)+'" '+(checkedIds.has(p.id)?'checked':'')+' style="width:auto"></label>').join('');
  updateDrawSummary();
