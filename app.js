@@ -33,6 +33,12 @@ function cardHtml(p){
  const name=esc(p.apelido||p.nome),pos=esc(p.posicao||'Jogador'),special=Number(overall)>=90;
  return '<article class="papangu-card'+(special?' papangu-card-special':'')+'" aria-label="Cartinha de '+esc(p.nome)+'"><div class="card-top"><div class="card-overall">'+(overall??'—')+'<small>GER</small><span>'+pos+'</span></div><div class="card-portrait">'+(url?'<img loading="lazy" src="'+esc(url)+'" alt="Foto de '+esc(p.nome)+'">':'<span aria-hidden="true">⚽</span>')+'</div></div><div class="card-name">'+name+'</div><div class="card-divider"></div><div class="card-stats">'+CARD_FIELDS.map(([k,label])=>'<div><b>'+(st?.[k]??'—')+'</b><span>'+label+'</span></div>').join('')+'</div><div class="card-footer">⚽ PELADA DOS PAPANGU</div></article>';
 }
+function compactDrawCard(p){
+ const st=officialCardFor(p)||cardStats[p.id]||null,overall=cardOverall(st),elite=Number(overall)>=90;
+ const photo=p.foto_path?'<img src="'+esc(photoUrl(p.foto_path))+'" alt="" loading="lazy">':'<span class="compact-ball">⚽</span>';
+ return '<div class="compact-draw-card'+(elite?' compact-draw-elite':'')+'"><div class="compact-draw-overall">'+(overall??'—')+'</div><div class="compact-draw-photo">'+photo+'</div><div class="compact-draw-info"><b>'+esc(p.apelido||p.nome)+'</b><span>'+starsHtml(p.estrelas)+'</span></div></div>';
+}
+function compactGuestCard(p){return '<div class="compact-draw-card compact-draw-guest"><div class="compact-draw-overall">—</div><div class="compact-draw-photo"><span class="compact-ball">⚽</span></div><div class="compact-draw-info"><b>'+esc(p.nome)+'</b><span>'+starsHtml(p.estrelas)+'</span></div></div>';}
 function openPlayerCard(id){
  const p=players.find(x=>x.id===id);if(!p)return;
  $('card-modal-title').textContent=p.nome;
@@ -167,7 +173,7 @@ $('draw').onclick=()=>{
  const shuffled=[...selected].map(p=>({p,r:Math.random()})).sort((a,b)=>b.p.estrelas-a.p.estrelas||a.r-b.r).map(x=>x.p);
  const teams=Array.from({length:n},()=>[]);
  shuffled.forEach((p,i)=>{const round=Math.floor(i/n),idx=i%n,team=round%2===0?idx:n-1-idx;teams[team].push(p);});
- $('draw-result').innerHTML=teams.map((t,i)=>'<div class="panel"><h3>⚽ Time '+(i+1)+'</h3>'+'<div class="team-cards">'+t.map(p=>p.guest?'<div class="guest-card">⚽<b>'+esc(p.nome)+'</b><small>Diarista · '+String(p.estrelas).replace('.',',')+' ★</small><span>Estatísticas pendentes</span></div>':'<div class="team-player-entry">'+cardHtml(p)+'<div class="team-player-stars">'+starsHtml(p.estrelas)+'</div></div>').join('')+'</div>'+'</div>').join('');
+ $('draw-result').innerHTML=teams.map((t,i)=>'<div class="panel draw-team-panel"><h3>⚽ Time '+(i+1)+'</h3><div class="team-cards">'+t.map(p=>p.guest?'<div class="team-player-entry"><div class="draw-desktop-card guest-card">⚽<b>'+esc(p.nome)+'</b><small>Diarista · '+String(p.estrelas).replace('.',',')+' ★</small><span>Estatísticas pendentes</span></div>'+compactGuestCard(p)+'</div>':'<div class="team-player-entry"><div class="draw-desktop-card">'+cardHtml(p)+'</div><div class="draw-desktop-stars team-player-stars">'+starsHtml(p.estrelas)+'</div>'+compactDrawCard(p)+'</div>').join('')+'</div></div>').join('');
  msg('Times sorteados! Diaristas foram incluídos apenas neste sorteio.');
  $('draw-result').scrollIntoView({behavior:'smooth',block:'start'});
 };
