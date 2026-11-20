@@ -196,6 +196,8 @@ function updateDrawLock(){
 function restoreDrawResult(){
  try{const saved=JSON.parse(localStorage.getItem(DRAW_SAVED_KEY)||'null');if(!saved?.html)return false;
  $('draw-result').innerHTML=saved.html.replace(/(<article class="(?:draw-mini-fifa draw-mini-elite|papangu-card papangu-card-special)"[^>]*>)(?!<div class="toty-crystals")/g,'$1<div class="toty-crystals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>');
+ // Remover cartinha extra de diaristas em resultados antigos salvos no navegador.
+ $('draw-result').querySelectorAll('.team-player-entry').forEach(entry=>{if(entry.querySelector('.draw-mini-guest'))entry.querySelector('.draw-full-card.guest-card')?.remove();});
  // Recalcular a raridade das cartas antigas já salvas, sem refazer o sorteio.
  $('draw-result').querySelectorAll('.draw-mini-fifa').forEach(card=>{const score=card.querySelector('.mini-stars .star-score');const value=score?Number(score.textContent.replace(',','.')):NaN;if(!Number.isFinite(value))return;const tier=value<2?'bronze':value<3?'silver':'gold';card.classList.remove('draw-mini-bronze','draw-mini-silver','draw-mini-gold');card.classList.add('draw-mini-'+tier);if(tier!=='gold'){card.classList.remove('draw-mini-elite');card.querySelector('.toty-crystals')?.remove();}});
  $('draw').textContent='Ver resultado do sorteio';
@@ -216,7 +218,7 @@ $('draw').onclick=()=>{
  const shuffled=[...selected].map(p=>({p,r:Math.random()})).sort((a,b)=>b.p.estrelas-a.p.estrelas||a.r-b.r).map(x=>x.p);
  const teams=Array.from({length:n},()=>[]);
  shuffled.forEach((p,i)=>{const round=Math.floor(i/n),idx=i%n,team=round%2===0?idx:n-1-idx;teams[team].push(p);});
- $('draw-result').innerHTML=teams.map((t,i)=>'<div class="panel draw-team-panel"><h3>⚽ Time '+(i+1)+'</h3><div class="team-cards">'+t.map(p=>p.guest?'<div class="team-player-entry"><div class="draw-full-card guest-card">⚽<b>'+esc(p.nome)+'</b><small>Diarista · '+String(p.estrelas).replace('.',',')+' ★</small></div><div class="team-player-stars">'+starsHtml(p.estrelas)+'</div>'+compactGuestCard(p)+'</div>':'<div class="team-player-entry"><div class="draw-full-card">'+cardHtml(p)+'</div><div class="team-player-stars">'+starsHtml(p.estrelas)+'</div>'+compactDrawCard(p)+'</div>').join('')+'</div></div>').join('');
+ $('draw-result').innerHTML=teams.map((t,i)=>'<div class="panel draw-team-panel"><h3>⚽ Time '+(i+1)+'</h3><div class="team-cards">'+t.map(p=>p.guest?'<div class="team-player-entry"><div class="team-player-stars">'+starsHtml(p.estrelas)+'</div>'+compactGuestCard(p)+'</div>':'<div class="team-player-entry"><div class="draw-full-card">'+cardHtml(p)+'</div><div class="team-player-stars">'+starsHtml(p.estrelas)+'</div>'+compactDrawCard(p)+'</div>').join('')+'</div></div>').join('');
  try{localStorage.setItem(DRAW_SAVED_KEY,JSON.stringify({html:$('draw-result').innerHTML,signature:currentDrawSignature(),createdAt:new Date().toISOString()}));}catch(e){}
  $('draw').textContent='Ver resultado do sorteio';
  $('draw').dataset.locked='true';
