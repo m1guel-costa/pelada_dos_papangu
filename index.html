@@ -783,6 +783,32 @@ body.draw-screen-open{overflow:hidden!important}
  #draw-result .draw-mini-elite .mini-stats{color:#fff1c6!important;text-shadow:0 1px 2px #000b31!important}
  #draw-result .draw-mini-elite .mini-stars{color:#ffe69c!important}
 }
+
+/* Raridade por estrelas: bronze <2, prata >=2 e <3; ouro >=3. */
+.papangu-card.papangu-card-silver{
+ color:#26303e!important;border-color:#eaf1f8!important;
+ background:linear-gradient(140deg,#f6f9ff 0%,#9ca9b9 26%,#e2e9f2 49%,#8997aa 74%,#d7e0ed 100%)!important;
+ box-shadow:inset 0 0 0 5px #7c899b!important;
+}
+.papangu-card.papangu-card-bronze{
+ color:#362114!important;border-color:#efb77f!important;
+ background:linear-gradient(140deg,#f2c59b 0%,#a9683d 27%,#dba477 50%,#85502d 74%,#e1a56f 100%)!important;
+ box-shadow:inset 0 0 0 5px #88512e!important;
+}
+@media(max-width:700px){
+ #draw-result .draw-mini-fifa.draw-mini-silver{
+  color:#283243!important;
+  background:linear-gradient(145deg,#f7faff 0%,#9daabb 32%,#e7edf6 58%,#8796aa 100%)!important;
+  box-shadow:inset 0 0 0 2px #7c899c!important;
+ }
+ #draw-result .draw-mini-fifa.draw-mini-bronze{
+  color:#382215!important;
+  background:linear-gradient(145deg,#f5c79d 0%,#a9673e 32%,#e0a779 58%,#8e552e 100%)!important;
+  box-shadow:inset 0 0 0 2px #85502f!important;
+ }
+ #draw-result .draw-mini-silver:before{border-color:#f6faffbb!important}
+ #draw-result .draw-mini-bronze:before{border-color:#f5c392bb!important}
+}
 </style></head><body><div class="wrap">
 <header class="brand-header"><div class="brand-lockup"><span class="brand-ball">⚽</span><h1><span>Pelada dos</span><strong>Papangu</strong></h1></div><div class="brand-mascot"><span class="mascot-crown">♛</span><img id="papangu-brand-photo" src="data:image/webp;base64,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" alt="Mascote da Pelada dos Papangu"></div></header><p id="message" aria-live="polite"></p>
 <section id="setup" class="panel hide"><h2>Configuração pendente</h2><p>O administrador precisa configurar o Supabase em <code>supabase-config.js</code>.</p></section>
