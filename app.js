@@ -43,9 +43,9 @@ function cardHtml(p){
  return '<article class="papangu-card papangu-card-'+tier+(special?' papangu-card-special':'')+'" aria-label="Cartinha de '+esc(p.nome)+'">'+(special?'<div class="toty-crystals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>':'')+'<div class="card-top"><div class="card-overall">'+(overall??'—')+'<small>GER</small><span>'+pos+'</span></div><div class="card-portrait">'+(url?'<img loading="lazy" src="'+esc(url)+'" alt="Foto de '+esc(p.nome)+'">':'<span aria-hidden="true">⚽</span>')+'</div></div><div class="card-name">'+name+'</div><div class="card-divider"></div><div class="card-stats">'+CARD_FIELDS.map(([k,label])=>'<div><b>'+(st?.[k]??'—')+'</b><span>'+label+'</span></div>').join('')+'</div><div class="card-footer">⚽ PELADA DOS PAPANGU</div></article>';
 }
 function rankingMiniCard(p){
- const st=officialCardFor(p)||cardStats[p.id]||null,overall=cardOverall(st),elite=Number(overall)>=90;
+ const st=officialCardFor(p)||cardStats[p.id]||null,overall=cardOverall(st),tier=cardTier(p),elite=tier==='gold'&&Number(overall)>=90;
  const photo=p.foto_path?'<img loading="lazy" src="'+esc(photoUrl(p.foto_path))+'" alt="">':'<span>⚽</span>';
- return '<span class="rank-mini-card'+(elite?' rank-mini-toty':'')+'"><strong>'+(overall??'—')+'</strong><span class="rank-mini-photo">'+photo+'</span><small>'+esc(positionAbbr(p.posicao))+'</small></span>';
+ return '<span class="rank-mini-card'+(elite?' rank-mini-toty':tier==='silver'?' rank-mini-silver':tier==='bronze'?' rank-mini-bronze':'')+'"><strong>'+(overall??'—')+'</strong><span class="rank-mini-photo">'+photo+'</span><small>'+esc(positionAbbr(p.posicao))+'</small></span>';
 }
 function compactDrawCard(p){
  const st=officialCardFor(p)||cardStats[p.id]||null,overall=cardOverall(st),tier=cardTier(p),elite=tier==='gold'&&Number(overall)>=90;
