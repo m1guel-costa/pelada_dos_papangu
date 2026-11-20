@@ -184,5 +184,14 @@ $('draw').onclick=()=>{
  shuffled.forEach((p,i)=>{const round=Math.floor(i/n),idx=i%n,team=round%2===0?idx:n-1-idx;teams[team].push(p);});
  $('draw-result').innerHTML=teams.map((t,i)=>'<div class="panel draw-team-panel"><h3>⚽ Time '+(i+1)+'</h3><div class="team-cards">'+t.map(p=>p.guest?'<div class="team-player-entry"><div class="draw-full-card guest-card">⚽<b>'+esc(p.nome)+'</b><small>Diarista · '+String(p.estrelas).replace('.',',')+' ★</small></div><div class="team-player-stars">'+starsHtml(p.estrelas)+'</div>'+compactGuestCard(p)+'</div>':'<div class="team-player-entry"><div class="draw-full-card">'+cardHtml(p)+'</div><div class="team-player-stars">'+starsHtml(p.estrelas)+'</div>'+compactDrawCard(p)+'</div>').join('')+'</div></div>').join('');
  msg('Times sorteados! Diaristas foram incluídos apenas neste sorteio.');
- $('draw-result').scrollIntoView({behavior:'smooth',block:'start'});
+ const result=$('draw-result');
+ result.classList.add('draw-focus');
+ result.setAttribute('role','dialog');
+ result.setAttribute('aria-modal','true');
+ result.setAttribute('aria-label','Resultado do sorteio');
+ let close=document.getElementById('draw-focus-close');
+ if(!close){close=document.createElement('button');close.id='draw-focus-close';close.type='button';close.textContent='✕ Fechar resultado';close.onclick=()=>{result.classList.remove('draw-focus');close.classList.add('hide');document.body.classList.remove('draw-focus-open');$('draw').focus();};document.body.appendChild(close);}
+ close.classList.remove('hide');
+ document.body.classList.add('draw-focus-open');
+ result.scrollTop=0;
 };
