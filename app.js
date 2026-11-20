@@ -158,7 +158,7 @@ $('refresh').onclick=refresh;
 async function refresh(){
  const {data,error}=await db.from('players').select('id,nome,apelido,posicao,estrelas,role,foto_path').order('estrelas',{ascending:false});
  if(error){msg(error.message,true);return;}players=data||[];await loadCardStats();
- $('ranking').innerHTML=players.length?players.map((p,i)=>'<button type="button" class="ranking-card-entry" data-card-id="'+esc(p.id)+'" aria-label="Abrir cartinha de '+esc(p.nome)+'"><span class="ranking-place">#'+(i+1)+'</span>+'<span class="ranking-full-card">'+cardHtml(p)+'</span><span class="ranking-rating">'+starsHtml(p.estrelas)+'</span></button>').join(''):'Nenhum jogador cadastrado ainda.';
+ $('ranking').innerHTML=players.length?players.map((p,i)=>'<button type="button" class="ranking-card-entry" data-card-id="'+esc(p.id)+'" aria-label="Abrir cartinha de '+esc(p.nome)+'"><span class="ranking-place">#'+(i+1)+'</span><span class="ranking-full-card">'+cardHtml(p)+'</span><span class="ranking-rating">'+starsHtml(p.estrelas)+'</span></button>').join(''):'Nenhum jogador cadastrado ainda.';
  const checkedIds=new Set([...document.querySelectorAll('.participant:checked')].map(el=>el.value));
  $('participants').innerHTML=players.map(p=>'<label class="item"><span class="participant-name">'+esc(p.nome)+'<small>'+esc(p.posicao)+'</small></span><span class="participant-stars" aria-label="'+p.estrelas+' de 5 estrelas">'+starsHtml(p.estrelas)+'</span><input type="checkbox" class="participant" value="'+esc(p.id)+'" '+(checkedIds.has(p.id)?'checked':'')+' style="width:auto"></label>').join('');
  updateDrawSummary();
