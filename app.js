@@ -36,16 +36,17 @@ function positionAbbr(value){
  if(/goleiro|^gol$/.test(x))return 'GOL';
  return (String(value||'JOG').trim().slice(0,3)).toUpperCase();
 }
+function cardTier(p){const stars=Number(p.estrelas)||0;return stars<2?'bronze':stars<3?'silver':'gold';}
 function cardHtml(p){
  const st=officialCardFor(p)||cardStats[p.id]||null,overall=cardOverall(st),url=p.foto_path?photoUrl(p.foto_path):'';
- const name=esc(p.apelido||p.nome),pos=esc(positionAbbr(p.posicao)),special=Number(overall)>=90;
- return '<article class="papangu-card'+(special?' papangu-card-special':'')+'" aria-label="Cartinha de '+esc(p.nome)+'">'+(special?'<div class="toty-crystals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>':'')+'<div class="card-top"><div class="card-overall">'+(overall??'—')+'<small>GER</small><span>'+pos+'</span></div><div class="card-portrait">'+(url?'<img loading="lazy" src="'+esc(url)+'" alt="Foto de '+esc(p.nome)+'">':'<span aria-hidden="true">⚽</span>')+'</div></div><div class="card-name">'+name+'</div><div class="card-divider"></div><div class="card-stats">'+CARD_FIELDS.map(([k,label])=>'<div><b>'+(st?.[k]??'—')+'</b><span>'+label+'</span></div>').join('')+'</div><div class="card-footer">⚽ PELADA DOS PAPANGU</div></article>';
+ const name=esc(p.apelido||p.nome),pos=esc(positionAbbr(p.posicao)),tier=cardTier(p),special=tier==='gold'&&Number(overall)>=90;
+ return '<article class="papangu-card papangu-card-'+tier+(special?' papangu-card-special':'')+'" aria-label="Cartinha de '+esc(p.nome)+'">'+(special?'<div class="toty-crystals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>':'')+'<div class="card-top"><div class="card-overall">'+(overall??'—')+'<small>GER</small><span>'+pos+'</span></div><div class="card-portrait">'+(url?'<img loading="lazy" src="'+esc(url)+'" alt="Foto de '+esc(p.nome)+'">':'<span aria-hidden="true">⚽</span>')+'</div></div><div class="card-name">'+name+'</div><div class="card-divider"></div><div class="card-stats">'+CARD_FIELDS.map(([k,label])=>'<div><b>'+(st?.[k]??'—')+'</b><span>'+label+'</span></div>').join('')+'</div><div class="card-footer">⚽ PELADA DOS PAPANGU</div></article>';
 }
 function compactDrawCard(p){
- const st=officialCardFor(p)||cardStats[p.id]||null,overall=cardOverall(st),elite=Number(overall)>=90;
+ const st=officialCardFor(p)||cardStats[p.id]||null,overall=cardOverall(st),tier=cardTier(p),elite=tier==='gold'&&Number(overall)>=90;
  const photo=p.foto_path?'<img src="'+esc(photoUrl(p.foto_path))+'" alt="" loading="lazy">':'<span>⚽</span>';
  const stats=CARD_FIELDS.map(([key,label])=>'<span><b>'+(st?.[key]??'—')+'</b> '+label+'</span>').join('');
- return '<article class="draw-mini-fifa'+(elite?' draw-mini-elite':'')+'" aria-label="Cartinha de '+esc(p.nome)+'">'+(elite?'<div class="toty-crystals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>':'')+'<div class="mini-head"><strong>'+(overall??'—')+'<small>'+esc(positionAbbr(p.posicao))+'</small></strong><div class="mini-photo">'+photo+'</div></div><div class="mini-name">'+esc(p.apelido||p.nome)+'</div><div class="mini-stats">'+stats+'</div><div class="mini-stars">'+starsHtml(p.estrelas)+'</div></article>';
+ return '<article class="draw-mini-fifa draw-mini-'+tier+(elite?' draw-mini-elite':'')+'" aria-label="Cartinha de '+esc(p.nome)+'">'+(elite?'<div class="toty-crystals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>':'')+'<div class="mini-head"><strong>'+(overall??'—')+'<small>'+esc(positionAbbr(p.posicao))+'</small></strong><div class="mini-photo">'+photo+'</div></div><div class="mini-name">'+esc(p.apelido||p.nome)+'</div><div class="mini-stats">'+stats+'</div><div class="mini-stars">'+starsHtml(p.estrelas)+'</div></article>';
 }
 function compactGuestCard(p){return '<article class="draw-mini-fifa draw-mini-guest"><div class="mini-head"><strong>—<small>DIA</small></strong><div class="mini-photo">⚽</div></div><div class="mini-name">'+esc(p.nome)+'</div><div class="mini-stars">'+starsHtml(p.estrelas)+'</div></article>';}
 function openPlayerCard(id){
@@ -179,6 +180,8 @@ function openDrawScreen(){
 function restoreDrawResult(){
  try{const saved=JSON.parse(localStorage.getItem(DRAW_SAVED_KEY)||'null');if(!saved?.html)return false;
  $('draw-result').innerHTML=saved.html.replace(/(<article class="(?:draw-mini-fifa draw-mini-elite|papangu-card papangu-card-special)"[^>]*>)(?!<div class="toty-crystals")/g,'$1<div class="toty-crystals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>');
+ // Recalcular a raridade das cartas antigas já salvas, sem refazer o sorteio.
+ $('draw-result').querySelectorAll('.draw-mini-fifa').forEach(card=>{const score=card.querySelector('.mini-stars .star-score');const value=score?Number(score.textContent.replace(',','.')):NaN;if(!Number.isFinite(value))return;const tier=value<2?'bronze':value<3?'silver':'gold';card.classList.remove('draw-mini-bronze','draw-mini-silver','draw-mini-gold');card.classList.add('draw-mini-'+tier);if(tier!=='gold'){card.classList.remove('draw-mini-elite');card.querySelector('.toty-crystals')?.remove();}});
  $('draw').textContent='Ver resultado do sorteio';
  $('draw').dataset.locked='true';
  return true;}catch(e){return false;}
