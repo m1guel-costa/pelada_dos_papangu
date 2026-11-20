@@ -28,9 +28,17 @@ const OFFICIAL_BY_KEY=Object.fromEntries(Object.entries(OFFICIAL_CARDS).map(([k,
 function officialCardFor(p){const names=[p.apelido,p.nome].map(cardKey).filter(Boolean);if(names.some(n=>['caua luna','kauan','kauan luna','luna'].includes(n)))return OFFICIAL_BY_KEY['luna'];if(names.some(n=>n==='viana'||n.startsWith('viana ')||n.endsWith(' viana')))return OFFICIAL_BY_KEY['mv'];for(const key of names){const lookup=CARD_ALIASES[key]||key;const found=OFFICIAL_BY_KEY[cardKey(lookup)];if(found)return found;}return null;}
 
 function cardOverall(st){return st?.overall??null;}
+function positionAbbr(value){
+ const x=cardKey(value);
+ if(/atac|ponta|centroavante|centro avante|^ata$/.test(x))return 'ATA';
+ if(/meio|volante|armador|^mai$|^mei$/.test(x))return 'MAI';
+ if(/defens|zague|lateral|^zag$|^def$/.test(x))return 'DEF';
+ if(/goleiro|^gol$/.test(x))return 'GOL';
+ return (String(value||'JOG').trim().slice(0,3)).toUpperCase();
+}
 function cardHtml(p){
  const st=officialCardFor(p)||cardStats[p.id]||null,overall=cardOverall(st),url=p.foto_path?photoUrl(p.foto_path):'';
- const name=esc(p.apelido||p.nome),pos=esc(p.posicao||'Jogador'),special=Number(overall)>=90;
+ const name=esc(p.apelido||p.nome),pos=esc(positionAbbr(p.posicao)),special=Number(overall)>=90;
  return '<article class="papangu-card'+(special?' papangu-card-special':'')+'" aria-label="Cartinha de '+esc(p.nome)+'"><div class="card-top"><div class="card-overall">'+(overall??'—')+'<small>GER</small><span>'+pos+'</span></div><div class="card-portrait">'+(url?'<img loading="lazy" src="'+esc(url)+'" alt="Foto de '+esc(p.nome)+'">':'<span aria-hidden="true">⚽</span>')+'</div></div><div class="card-name">'+name+'</div><div class="card-divider"></div><div class="card-stats">'+CARD_FIELDS.map(([k,label])=>'<div><b>'+(st?.[k]??'—')+'</b><span>'+label+'</span></div>').join('')+'</div><div class="card-footer">⚽ PELADA DOS PAPANGU</div></article>';
 }
 function compactDrawCard(p){
