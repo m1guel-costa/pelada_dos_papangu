@@ -34,7 +34,7 @@ function playerCardStats(p){
  if(!base)return null;
  const stars=Number(p.estrelas)||0;
  if(stars>=5)return base;
- const bands=[[1,65,69],[1.5,70,74],[2,75,79],[2.5,80,84],[3,85,87],[3.5,88,89],[4,90,92],[4.5,93,95]];
+ const bands=[[1,65,69],[1.5,70,74],[2,75,79],[2.5,80,82],[3,83,85],[3.5,86,87],[4,88,88],[4.5,89,89]];
  const band=bands.find(([level])=>level===stars)||bands.reduce((prev,cur)=>Math.abs(cur[0]-stars)<Math.abs(prev[0]-stars)?cur:prev);
  const old=Number(base.overall);
  const overall=Number.isFinite(old)?Math.max(band[1],Math.min(band[2],old)):band[1];
@@ -52,16 +52,16 @@ function positionAbbr(value){
 function cardTier(p){const stars=Number(p.estrelas)||0;return stars<2?'bronze':stars<3?'silver':'gold';}
 function cardHtml(p){
  const st=playerCardStats(p),overall=cardOverall(st),url=p.foto_path?photoUrl(p.foto_path):'';
- const name=esc(p.apelido||p.nome),pos=esc(positionAbbr(p.posicao)),tier=cardTier(p),special=tier==='gold'&&Number(overall)>=90;
+ const name=esc(p.apelido||p.nome),pos=esc(positionAbbr(p.posicao)),tier=cardTier(p),special=Number(p.estrelas)===5&&Number(overall)>=90;
  return '<article class="papangu-card papangu-card-'+tier+(special?' papangu-card-special':'')+'" aria-label="Cartinha de '+esc(p.nome)+'">'+(special?'<div class="toty-crystals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>':'')+'<div class="card-top"><div class="card-overall">'+(overall??'—')+'<small>GER</small><span>'+pos+'</span></div><div class="card-portrait">'+(url?'<img loading="lazy" src="'+esc(url)+'" alt="Foto de '+esc(p.nome)+'">':'<span aria-hidden="true">⚽</span>')+'</div></div><div class="card-name">'+name+'</div><div class="card-divider"></div><div class="card-stats">'+CARD_FIELDS.map(([k,label])=>'<div><b>'+(st?.[k]??'—')+'</b><span>'+label+'</span></div>').join('')+'</div><div class="card-footer">⚽ PELADA DOS PAPANGU</div></article>';
 }
 function rankingMiniCard(p){
- const st=playerCardStats(p),overall=cardOverall(st),tier=cardTier(p),elite=tier==='gold'&&Number(overall)>=90;
+ const st=playerCardStats(p),overall=cardOverall(st),tier=cardTier(p),elite=Number(p.estrelas)===5&&Number(overall)>=90;
  const photo=p.foto_path?'<img loading="lazy" src="'+esc(photoUrl(p.foto_path))+'" alt="">':'<span>⚽</span>';
  return '<span class="rank-mini-card'+(elite?' rank-mini-toty':tier==='silver'?' rank-mini-silver':tier==='bronze'?' rank-mini-bronze':'')+'"><strong>'+(overall??'—')+'</strong><span class="rank-mini-photo">'+photo+'</span><small>'+esc(positionAbbr(p.posicao))+'</small></span>';
 }
 function compactDrawCard(p){
- const st=playerCardStats(p),overall=cardOverall(st),tier=cardTier(p),elite=tier==='gold'&&Number(overall)>=90;
+ const st=playerCardStats(p),overall=cardOverall(st),tier=cardTier(p),elite=Number(p.estrelas)===5&&Number(overall)>=90;
  const photo=p.foto_path?'<img src="'+esc(photoUrl(p.foto_path))+'" alt="" loading="lazy">':'<span>⚽</span>';
  const stats=CARD_FIELDS.map(([key,label])=>'<span><b>'+(st?.[key]??'—')+'</b> '+label+'</span>').join('');
  return '<article class="draw-mini-fifa draw-mini-'+tier+(elite?' draw-mini-elite':'')+'" aria-label="Cartinha de '+esc(p.nome)+'">'+(elite?'<div class="toty-crystals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>':'')+'<div class="mini-head"><strong>'+(overall??'—')+'<small>'+esc(positionAbbr(p.posicao))+'</small></strong><div class="mini-photo">'+photo+'</div></div><div class="mini-name">'+esc(p.apelido||p.nome)+'</div><div class="mini-stats">'+stats+'</div><div class="mini-stars">'+starsHtml(p.estrelas)+'</div></article>';
