@@ -177,6 +177,17 @@ function openDrawScreen(){
  screen.classList.remove('hide');document.body.classList.add('draw-screen-open');
  screen.scrollTop=0;
 }
+function currentDrawSignature(){
+ const ids=[...document.querySelectorAll('.participant:checked')].map(x=>x.value).sort();
+ const visitors=guests.map(g=>({name:String(g.nome||'').trim().toLowerCase(),stars:Number(g.estrelas)})).sort((a,b)=>a.name.localeCompare(b.name));
+ return JSON.stringify({ids,visitors,n:Number($('team-count').value),size:Number($('team-size').value)});
+}
+function updateDrawLock(){
+ let saved=null;try{saved=JSON.parse(localStorage.getItem(DRAW_SAVED_KEY)||'null');}catch(e){}
+ const same=!!saved?.html&&saved.signature===currentDrawSignature();
+ $('draw').textContent=same?'Ver resultado do sorteio':'Sortear times equilibrados';
+ $('draw').dataset.locked=String(same);
+}
 function restoreDrawResult(){
  try{const saved=JSON.parse(localStorage.getItem(DRAW_SAVED_KEY)||'null');if(!saved?.html)return false;
  $('draw-result').innerHTML=saved.html.replace(/(<article class="(?:draw-mini-fifa draw-mini-elite|papangu-card papangu-card-special)"[^>]*>)(?!<div class="toty-crystals")/g,'$1<div class="toty-crystals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>');
@@ -187,7 +198,8 @@ function restoreDrawResult(){
  return true;}catch(e){return false;}
 }
 $('draw').onclick=()=>{
- if(restoreDrawResult()){openDrawScreen();return;}
+ const saved=(()=>{try{return JSON.parse(localStorage.getItem(DRAW_SAVED_KEY)||'null')}catch(e){return null}})();
+ if(saved?.signature===currentDrawSignature()&&restoreDrawResult()){openDrawScreen();return;}
  const monthly=[...document.querySelectorAll('.participant:checked')].map(x=>players.find(p=>p.id===x.value)).filter(Boolean);
  const visitors=guests.map((g,i)=>({id:'guest-'+i,nome:g.nome,posicao:'Diarista',estrelas:g.estrelas,guest:true}));
  const selected=[...monthly,...visitors];
@@ -200,7 +212,7 @@ $('draw').onclick=()=>{
  const teams=Array.from({length:n},()=>[]);
  shuffled.forEach((p,i)=>{const round=Math.floor(i/n),idx=i%n,team=round%2===0?idx:n-1-idx;teams[team].push(p);});
  $('draw-result').innerHTML=teams.map((t,i)=>'<div class="panel draw-team-panel"><h3>⚽ Time '+(i+1)+'</h3><div class="team-cards">'+t.map(p=>p.guest?'<div class="team-player-entry"><div class="draw-full-card guest-card">⚽<b>'+esc(p.nome)+'</b><small>Diarista · '+String(p.estrelas).replace('.',',')+' ★</small></div><div class="team-player-stars">'+starsHtml(p.estrelas)+'</div>'+compactGuestCard(p)+'</div>':'<div class="team-player-entry"><div class="draw-full-card">'+cardHtml(p)+'</div><div class="team-player-stars">'+starsHtml(p.estrelas)+'</div>'+compactDrawCard(p)+'</div>').join('')+'</div></div>').join('');
- try{localStorage.setItem(DRAW_SAVED_KEY,JSON.stringify({html:$('draw-result').innerHTML,createdAt:new Date().toISOString()}));}catch(e){}
+ try{localStorage.setItem(DRAW_SAVED_KEY,JSON.stringify({html:$('draw-result').innerHTML,signature:currentDrawSignature(),createdAt:new Date().toISOString()}));}catch(e){}
  $('draw').textContent='Ver resultado do sorteio';
  $('draw').dataset.locked='true';
  msg('Sorteio concluído! O resultado foi fixado neste navegador.');
@@ -210,3 +222,12 @@ $('draw').onclick=()=>{
 // Tela exclusiva de resultado: voltar não realiza outro sorteio.
 $('draw-screen-back').onclick=()=>{ $('draw-screen').classList.add('hide');document.body.classList.remove('draw-screen-open'); };
 restoreDrawResult();
+updateDrawLock();
+
+// Alterar participantes ou diaristas libera uma NOVA escalação; não refaz a anterior.
+$('participants').addEventListener('change',updateDrawLock);
+$('team-count').addEventListener('change',updateDrawLock);
+$('team-size').addEventListener('change',updateDrawLock);
+const drawGuestObserver=new MutationObserver(updateDrawLock);
+const guestList=document.getElementById('guest-list');
+if(guestList)drawGuestObserver.observe(guestList,{childList:true,subtree:true});
