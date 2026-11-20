@@ -167,7 +167,7 @@ $('draw').onclick=()=>{
  const shuffled=[...selected].map(p=>({p,r:Math.random()})).sort((a,b)=>b.p.estrelas-a.p.estrelas||a.r-b.r).map(x=>x.p);
  const teams=Array.from({length:n},()=>[]);
  shuffled.forEach((p,i)=>{const round=Math.floor(i/n),idx=i%n,team=round%2===0?idx:n-1-idx;teams[team].push(p);});
- $('draw-result').innerHTML=teams.map((t,i)=>'<div class="panel"><h3>⚽ Time '+(i+1)+'</h3>'+'<div class="team-cards">'+t.map(p=>p.guest?'<div class="guest-card">⚽<b>'+esc(p.nome)+'</b><small>Diarista · '+String(p.estrelas).replace('.',',')+' ★</small><span>Estatísticas pendentes</span></div>':cardHtml(p)+'<div class="team-player-stars">'+starsHtml(p.estrelas)+'</div>').join('')+'</div>'+'</div>').join('');
+ $('draw-result').innerHTML=teams.map((t,i)=>'<div class="panel"><h3>⚽ Time '+(i+1)+'</h3>'+'<div class="team-cards">'+t.map(p=>p.guest?'<div class="guest-card">⚽<b>'+esc(p.nome)+'</b><small>Diarista · '+String(p.estrelas).replace('.',',')+' ★</small><span>Estatísticas pendentes</span></div>':'<div class="team-player-entry">'+cardHtml(p)+'<div class="team-player-stars">'+starsHtml(p.estrelas)+'</div></div>').join('')+'</div>'+'</div>').join('');
  msg('Times sorteados! Diaristas foram incluídos apenas neste sorteio.');
  $('draw-result').scrollIntoView({behavior:'smooth',block:'start'});
 };
