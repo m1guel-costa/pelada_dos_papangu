@@ -44,7 +44,7 @@ function cardHtml(p){
 function compactDrawCard(p){
  const st=officialCardFor(p)||cardStats[p.id]||null,overall=cardOverall(st),elite=Number(overall)>=90;
  const photo=p.foto_path?'<img src="'+esc(photoUrl(p.foto_path))+'" alt="" loading="lazy">':'<span class="compact-ball">⚽</span>';
- return '<div class="compact-draw-card'+(elite?' compact-draw-elite':'')+'"><div class="compact-draw-overall">'+(overall??'—')+'</div><div class="compact-draw-photo">'+photo+'</div><div class="compact-draw-info"><b>'+esc(p.apelido||p.nome)+'</b><span>'+starsHtml(p.estrelas)+'</span></div></div>';
+ return '<div class="compact-draw-card'+(elite?' compact-draw-elite':'')+'"><div class="compact-draw-overall">'+(overall??'—')+'<small>'+esc(positionAbbr(p.posicao))+'</small></div><div class="compact-draw-photo">'+photo+'</div><div class="compact-draw-info"><b>'+esc(p.apelido||p.nome)+'</b><span>'+starsHtml(p.estrelas)+'</span></div></div>';
 }
 function compactGuestCard(p){return '<div class="compact-draw-card compact-draw-guest"><div class="compact-draw-overall">—</div><div class="compact-draw-photo"><span class="compact-ball">⚽</span></div><div class="compact-draw-info"><b>'+esc(p.nome)+'</b><span>'+starsHtml(p.estrelas)+'</span></div></div>';}
 function openPlayerCard(id){
