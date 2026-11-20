@@ -43,10 +43,11 @@ function cardHtml(p){
 }
 function compactDrawCard(p){
  const st=officialCardFor(p)||cardStats[p.id]||null,overall=cardOverall(st),elite=Number(overall)>=90;
- const photo=p.foto_path?'<img src="'+esc(photoUrl(p.foto_path))+'" alt="" loading="lazy">':'<span class="compact-ball">⚽</span>';
- return '<div class="compact-draw-card'+(elite?' compact-draw-elite':'')+'"><div class="compact-draw-overall">'+(overall??'—')+'<small>'+esc(positionAbbr(p.posicao))+'</small></div><div class="compact-draw-photo">'+photo+'</div><div class="compact-draw-info"><b>'+esc(p.apelido||p.nome)+'</b><span>'+starsHtml(p.estrelas)+'</span></div></div>';
+ const photo=p.foto_path?'<img src="'+esc(photoUrl(p.foto_path))+'" alt="" loading="lazy">':'<span>⚽</span>';
+ const stats=CARD_FIELDS.map(([key,label])=>'<span><b>'+(st?.[key]??'—')+'</b> '+label+'</span>').join('');
+ return '<article class="draw-mini-fifa'+(elite?' draw-mini-elite':'')+'" aria-label="Cartinha de '+esc(p.nome)+'"><div class="mini-head"><strong>'+(overall??'—')+'<small>'+esc(positionAbbr(p.posicao))+'</small></strong><div class="mini-photo">'+photo+'</div></div><div class="mini-name">'+esc(p.apelido||p.nome)+'</div><div class="mini-stats">'+stats+'</div><div class="mini-stars">'+starsHtml(p.estrelas)+'</div></article>';
 }
-function compactGuestCard(p){return '<div class="compact-draw-card compact-draw-guest"><div class="compact-draw-overall">—</div><div class="compact-draw-photo"><span class="compact-ball">⚽</span></div><div class="compact-draw-info"><b>'+esc(p.nome)+'</b><span>'+starsHtml(p.estrelas)+'</span></div></div>';}
+function compactGuestCard(p){return '<article class="draw-mini-fifa draw-mini-guest"><div class="mini-head"><strong>—<small>DIA</small></strong><div class="mini-photo">⚽</div></div><div class="mini-name">'+esc(p.nome)+'</div><div class="mini-stars">'+starsHtml(p.estrelas)+'</div></article>';}
 function openPlayerCard(id){
  const p=players.find(x=>x.id===id);if(!p)return;
  $('card-modal-title').textContent=p.nome;
